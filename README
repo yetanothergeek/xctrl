@@ -1,0 +1,40 @@
+The X11 control library is a shared library that allows you to query and
+manipulate various aspects of an X11 window manager and the windows it manages. 
+
+It is based largely on Tomas Styblo's "wmctrl" command line tool, but has been
+transformed into a C library with some additional features and a Lua binding.
+
+It is intended to work with any EWMH / NetWM compatible window manager, but 
+since support for these standards varies between different window managers and
+clients, some functionality might be missing in some environments.
+
+To build the Lua module, simply type "make" from the top-level directory,
+and "make install" to install install it in Lua's package.cpath.
+
+By default the Makefile builds a stripped library optimized for size,
+but you can disable optimizations and retain debugging information by
+using "make DEBUG=1"
+
+It is also possible to build a separate shared library for use in
+other applications by typing "make lib" but there is currently no
+"make install" target for that type of build.
+
+
+To link the C library statically into your own standalone application 
+or library, define XCTRL_API as static and include the "wmctrl.c" 
+source file directly:
+
+ #include <X11/Xlib.h>
+ #define XCTRL_API static
+ #include "xctrl.c"
+
+
+
+The Lua binding should be fairly well documented, see the file:
+ ./docs/lwmctrl.html
+
+There is currently no documentation for the C library, but reading the
+sources and the Lua docs should give you some idea of what's there.
+
+
+

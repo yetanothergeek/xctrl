@@ -1,0 +1,394 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>Lua Window Manager Control Module</title>
+<style type="text/css">
+<!--
+TD.func { font-family:monospace; width:33% }
+TD { padding-left: 8px; padding-right: 8px; }
+TR.odd {background-color: #F8F8FF}
+TR.even {background-color: #FCFFF4}
+A { text-decoration:none }
+A:hover { background-color: #ffeeff; text-decoration:underline }
+P {margin-left:5%;margin-right:10%;}
+PRE {margin-left:5%;margin-right:10%;}
+-->
+</style>
+</head>
+<body>
+<hr><h2>Window Manager Control Module</h2><hr>
+<p><br><br>
+The window manager control module (<b>xctrl</b>) is a Lua module which allows you to query and 
+manipulate various aspects of an X11 window manager and the windows it manages. It is based
+largely on <i>Tomas Styblo's</i> <tt><b>wmctrl</b></tt> command line tool, but has been transformed 
+into a C library with a Lua binding. It is intended to work with any EWMH / NetWM compatible 
+window manager. Because support for these standards varies with different window managers
+and clients, some features might not work in all situations.
+</p><p>
+The functions described below are intended to be used in object-oriented style, for example:</p>
+<pre>
+  require "xctrl"             -- load the module
+  local xc=xctrl.new()        -- create a new xctrl object
+  local win=xc:get_active_win()   -- find the currently active window
+  xc:close_win(win)           -- close the window
+</pre>
+<p>
+Note that only one instance of the xctrl object at a time is allowed to be in use.
+If for some reason you need to re-initialize a new object, you should set the old one 
+to <tt><b>nil</b></tt> and call <tt>collectgarbage()</tt> twice before trying to create 
+another new object. This will help insure that the first instance is properly cleaned up.
+<br><br>
+</p>
+<hr>
+<center><h3>xctrl functions</h3></center>
+<hr>
+<table summary="Table of contents" width="95%">
+<tr class="odd"><td class="func"><a href="#new">new (display [,as_utf8 [,charset]])</a></td>
+<td>-- Create a new xctrl object.</td></tr>
+<tr class="even"><td class="func"><a href="#get_win_list">get_win_list ()</a></td>
+<td>-- Return a list of all top-level windows.</td></tr>
+<tr class="odd"><td class="func"><a href="#get_win_title">get_win_title (win)</a></td>
+<td>-- Get the title of a window.</td></tr>
+<tr class="even"><td class="func"><a href="#set_win_title">set_win_title (win,title)</a></td>
+<td>-- Set the title of a window.</td></tr>
+<tr class="odd"><td class="func"><a href="#get_win_class">get_win_class ()</a></td>
+<td>-- Get the class name of a window.</td></tr>
+<tr class="even"><td class="func"><a href="#activate_win">activate_win (win [,switch])</a></td>
+<td>-- Raise and focus a window.</td></tr>
+<tr class="odd"><td class="func"><a href="#iconify_win">iconify_win(win)</a></td>
+<td>-- Change a window's state to iconic.</td></tr>
+<tr class="even"><td class="func"><a href="#set_win_state">set_win_state (win,mode,p1 [,p2])</a></td>
+<td>-- Change a window's state properties.</td></tr>
+<tr class="odd"><td class="func"><a href="#set_win_geom">set_win_geom (win,x,y,w,h)</a></td>
+<td>-- Move and/or resize a window</td></tr>
+<tr class="even"><td class="func"><a href="#get_win_geom">get_win_geom ()</a></td>
+<td>-- Get a window's size and position</td></tr>
+<tr class="odd"><td class="func"><a href="#get_active_win">get_active_win ()</a></td>
+<td>-- Get the id of the currently active window.</td></tr>
+<tr class="even"><td class="func"><a href="#pick_win">pick_win ( [button] )</a></td>
+<td>-- Get the id of a window by clicking it with the mouse.</td></tr>
+<tr class="odd"><td class="func"><a href="#root_win">root_win ()</a></td>
+<td>-- Get the id of the display's root window.</td></tr>
+<tr class="even"><td class="func"><a href="#set_desk_of_win">set_desk_of_win (win,desk)</a></td>
+<td>-- Move a window onto another desktop.</td></tr>
+<tr class="odd"><td class="func"><a href="#get_desk_of_win">get_desk_of_win (win)</a></td>
+<td>-- Get the index of a window's desktop.</td></tr>
+<tr class="even"><td class="func"><a href="#get_pid_of_win">get_pid_of_win (win)</a></td>
+<td>-- Get the process id of a window.</td></tr>
+<tr class="odd"><td class="func"><a href="#close_win">close_win (win)</a></td>
+<td>-- Try to close a window gracefully.</td></tr>
+<tr class="even"><td class="func"><a href="#get_win_client">get_win_client (win)</a></td>
+<td>-- Get a window's client machine name.</td></tr>
+<tr class="odd"><td class="func"><a href="#get_num_desks">get_num_desks ()</a></td>
+<td>-- Get the total number of desktops.</td></tr>
+<tr class="even"><td class="func"><a href="#set_num_desks">set_num_desks ()</a></td>
+<td>-- Set the total number of desktops.</td></tr>
+<tr class="odd"><td class="func"><a href="#get_curr_desk">get_curr_desk ()</a></td>
+<td>-- Get the index of the current active desktop.</td></tr>
+<tr class="even"><td class="func"><a href="#set_curr_desk">set_curr_desk (desk)</a></td>
+<td>-- Switch to another desktop</td></tr>
+<tr class="odd"><td class="func"><a href="#get_display">get_display ()</a></td>
+<td>-- Return the the X11 display name.</td></tr>
+<tr class="even"><td class="func"><a href="#get_wm_win">get_wm_win ()</a></td>
+<td>-- Get the window manager's information window.</td></tr>
+<tr class="odd"><td class="func"><a href="#get_wm_name">get_wm_name ()</a></td>
+<td>-- Get the window manager's name.</td></tr>
+<tr class="even"><td class="func"><a href="#get_wm_class">get_wm_class ()</a></td>
+<td>-- Get the window manager's class name.</td></tr>
+<tr class="odd"><td class="func"><a href="#get_wm_pid">get_wm_pid ()</a></td>
+<td>-- Get the window manager's process id.</td></tr>
+<tr class="even"><td class="func"><a href="#get_desk_name">get_desk_name (desk)</a></td>
+<td>-- Get the name of a desktop.</td></tr>
+<tr class="odd"><td class="func"><a href="#get_workarea">get_workarea (desk)</a></td>
+<td>-- Get the effective working dimensions of a desktop.</td></tr>
+<tr class="even"><td class="func"><a href="#get_desk_geom">get_desk_geom (desk)</a></td>
+<td>--  Get the overall dimensions of a desktop.</td></tr>
+<tr class="odd"><td class="func"><a href="#set_desk_vport">set_desk_vport (desk,x,y)</a></td>
+<td>-- Set a desktop's viewport x-y coordinates.</td></tr>
+<tr class="even"><td class="func"><a href="#set_desk_geom">set_desk_geom (desk,w,h)</a></td>
+<td>-- Set a desktop's dimensions.</td></tr>
+<tr class="odd"><td class="func"><a href="#set_showing_desk">set_showing_desk (showing)</a></td>
+<td>-- Set window manager's "showing desktop" mode.</td></tr>
+<tr class="even"><td class="func"><a href="#get_showing_desk">get_showing_desk ()</a></td>
+<td>-- Get window manager's "showing desktop" mode.</td></tr>
+<tr class="odd"><td class="func"><a href="#set_selection">set_selection(text[,mode[,utf8]])</a></td>
+<td>-- Push text into X selection, clipboard, or cut buffer.</td></tr>
+<tr class="even"><td class="func"><a href="#get_selection"> get_selection ( [mode [,utf8] )</a></td>
+<td>-- Retreive text from X selection, clipboard, or cut buffer.</td></tr>
+<tr class="odd"><td class="func"><a href="#send_keys">send_keys (win,keys)</a></td>
+<td>-- Send simulated keyboard actions to a window.</td></tr>
+<tr class="even"><td class="func"><a href="#do_events"> do_events( [count] )</a></td>
+<td>-- Flush the X server's event queue.</td></tr>
+<tr class="odd"><td class="func"><a href="#convert_locale">convert_locale (str,from,to)</a></td>
+<td>-- Convert string between locales.</td></tr>
+</table>
+<hr>
+<a name="new"></a><hr><h3><tt>new ([display [,as_utf8 [,charset]]])</tt></h3>
+<p>
+Returns a new <tt><b>xctrl</b></tt> object. The default <tt><b>display</b></tt> is used if none was specified. 
+If the optional <tt><b>as_utf8</b></tt> argument is <tt><b>true</b></tt>,
+xctrl will attempt to use UTF-8 encoding for all strings passed to and from X11.
+If the optional <tt><b>charset</b></tt> string argument is present, it will try to use that value
+for character set conversions, otherwise it will use the <tt>$CHARSET</tt> environment variable if 
+present, or fall back to a default of <tt><b>ISO_8859-1</b></tt> .
+ 
+<br><br></p>
+<a name="get_win_list"></a><hr><h3><tt>get_win_list ()</tt></h3>
+<p>
+Returns an indexed list of all top-level window id numbers on the current display.
+<br><br></p>
+<a name="get_win_title"></a><hr><h3><tt>get_win_title (win)</tt></h3>
+<p>
+Returns the title bar text of the specified window id.
+<br><br></p>
+<a name="set_win_title"></a><hr><h3><tt>set_win_title (win,title)</tt></h3>
+<p>
+Sets the title bar text of the specified window id.
+<br><br></p>
+<a name="get_win_class"></a><hr><h3><tt>get_win_class ()</tt></h3>
+<p>
+Returns the X11 class name (<tt>WM_CLASS</tt> property) of the specified window id.
+<br><br></p>
+<a name="activate_win"></a><hr><h3><tt>activate_win (win [,switch])</tt></h3>
+<p>
+Raises the specified window and gives it the focus. If the window is not on the current desktop, 
+the desktop containing the window will also be activated, unless the optional <tt><b>switch</b></tt>
+argument is <tt><b>false</b></tt>.
+<br><br></p>
+<a name="iconify_win"></a><hr><h3><tt>iconify_win (win)</tt></h3>
+<p>
+Changes the specified window's state to iconic or "minimized".
+<br><br></p>
+<a name="set_win_state"></a><hr><h3><tt>set_win_state (win,mode,p1 [,p2])</tt></h3>
+<p>
+Modify up to two of the window's properties simultaneously. 
+The property change is achived by using the <tt>_NET_WM_STATE</tt> request.</p><p>
+The <tt><b>mode</b></tt> string argument must be one of: 
+<tt><b>"add"</b></tt>, <tt><b>"remove"</b></tt> or <tt><b>"toggle"</b></tt></p><p>
+The supported property names (for <tt><b>p1</b></tt> and  <tt><b>p2</b></tt>) are:<br> &nbsp; 
+<tt><b>"modal"</b></tt>, 
+<tt><b>"sticky"</b></tt>, 
+<tt><b>"maximized_vert"</b></tt>, 
+<tt><b>"maximized_horz"</b></tt>, 
+<tt><b>"shaded"</b></tt>, 
+<tt><b>"skip_taskbar"</b></tt>, 
+<tt><b>"skip_pager"</b></tt>, 
+<tt><b>"hidden"</b></tt>, 
+<tt><b>"fullscreen"</b></tt>, 
+<tt><b>"above"</b></tt> 
+and
+<tt><b>"below"</b></tt> .</p><p>  
+              
+
+<br><br></p>
+<a name="set_win_geom"></a><hr><h3><tt>set_win_geom (win,x,y,w,h)</tt></h3>
+<p>
+Adjust the location and/or size of the window.
+If the <tt><b>x</b></tt> or <tt><b>y</b></tt> arguments are negative, they are ignored and 
+only the size is adjusted. Likewise, if the <tt><b>w</b></tt> or <tt><b>h</b></tt> arguments
+are negative, they are ignored and only the position is adjusted.
+<br><br></p>
+<a name="get_win_geom"></a><hr><h3><tt>get_win_geom ()</tt></h3>
+<p>
+If sucessful, returns a table containing the <tt><b>x</b></tt>, <tt><b>y</b></tt>,
+<tt><b>w</b></tt> and <tt><b>h</b></tt> values of the specified window.</p><p>
+On failure, returns <tt><b>nil</b></tt> plus an error message.
+<br><br></p>
+<a name="get_active_win"></a><hr><h3><tt>get_active_win ()</tt></h3>
+<p>
+Returns the window id number of the currently active window.
+<br><br></p>
+<a name="pick_win"></a><hr><h3><tt>pick_win ( [button] )</tt></h3>
+<p>
+Displays a "crosshair" mouse cursor allowing the user to select a window by mouse click.</p><p>
+By default any button click selects the window, but the optional <tt><b>button</b></tt> argument
+allows you to specify which mouse button (1,2,3)  will trigger the selection event. 
+For example, you might want to ignore a left-click to minimize some other windows, 
+and instead use a right-click (the third button) to pick the window you want. 
+</p><p><u>Caution</u>: Don't specify button number three if you only have a two-button mouse!
+</p><p>
+Returns the window id number of the clicked window.
+<br><br></p>
+<a name="root_win"></a><hr><h3><tt>root_win ()</tt></h3>
+<p>
+Returns the window id of the window manager's root window.
+<br><br></p>
+<a name="set_desk_of_win"></a><hr><h3><tt>set_desk_of_win (win,desk)</tt></h3>
+<p>
+Moves the window to the desktop at the specified <tt><b>desk</b></tt> index.</p><p>
+(Note that the desktop indexes in Lua begin at one, not zero.)
+<br><br></p>
+<a name="get_desk_of_win"></a><hr><h3><tt>get_desk_of_win (win)</tt></h3>
+<p>
+Returns the index of the desktop that contains the specified window.
+<br><br></p>
+<a name="get_pid_of_win"></a><hr><h3><tt>get_pid_of_win (win)</tt></h3>
+<p>
+Returns the process id (PID) of the specified window, provided the application exports 
+the _NET_WM_PID property.
+<br><br></p>
+<a name="close_win"></a><hr><h3><tt>close_win (win)</tt></h3>
+Attempts to gracefully close the specified window.
+<p>
+
+<br><br></p>
+<a name="get_win_client"></a><hr><h3><tt>get_win_client (win)</tt></h3>
+<p>
+Returns the client machine's name, provided the application exports 
+the WM_CLIENT_MACHINE property.
+<br><br></p>
+<a name="get_num_desks"></a><hr><h3><tt>get_num_desks ()</tt></h3>
+<p>
+Returns the configured number of desktops for the window manager.
+<br><br></p>
+<a name="set_num_desks"></a><hr><h3><tt>set_num_desks ()</tt></h3>
+<p>
+Changes the configured number of desktops for the window manager.</p>
+<p>(Not all window managers allow this.)
+<br><br></p>
+<a name="get_curr_desk"></a><hr><h3><tt>get_curr_desk ()</tt></h3>
+<p>
+Returns the index number of the active desktop.</p><p>
+(Note that the desktop indexes in Lua begin at one, not zero.)
+<br><br></p>
+<a name="set_curr_desk"></a><hr><h3><tt>set_curr_desk (desk)</tt></h3>
+<p>
+Switch to the desktop at index <tt><b>desk</b></tt>.
+<br><br></p>
+<a name="get_display"></a><hr><h3><tt>get_display ()</tt></h3>
+<p>
+Returns the name of the current display.
+<br><br></p>
+<a name="get_wm_win"></a><hr><h3><tt>get_wm_win ()</tt></h3>
+<p>
+Returns the window id of the window manager's SUPPORTING_WM_CHECK window.</p><p>
+This value is of little use, but unless it returns non-zero the 
+<tt><b>get_wm_name</b></tt>,
+<tt><b>get_wm_class</b></tt> and 
+<tt><b>get_wm_pid</b></tt>
+functions will also fail.
+<br><br></p>
+<a name="get_wm_name"></a><hr><h3><tt>get_wm_name ()</tt></h3>
+<p>
+Returns the window manager's name property (if supported).
+<br><br></p>
+<a name="get_wm_class"></a><hr><h3><tt>get_wm_class ()</tt></h3>
+<p>
+Returns the window manager's class property (if supported).
+<br><br></p>
+<a name="get_wm_pid"></a><hr><h3><tt>get_wm_pid ()</tt></h3>
+<p>
+Returns the window manager's process id (if supported).
+<br><br></p>
+<a name="get_desk_name"></a><hr><h3><tt>get_desk_name (desk)</tt></h3>
+<p>
+Returns the name of the desktop at index <tt><b>desk</b></tt>.
+<br><br></p>
+<a name="get_workarea"></a><hr><h3><tt>get_workarea (desk)</tt></h3>
+<p>
+Returns a table containing the <tt><b>x</b></tt>, <tt><b>y</b></tt>,
+<tt><b>w</b></tt> and <tt><b>h</b></tt> values of the effective working area 
+for the desktop at index <tt><b>desk</b></tt>. This may be smaller than the
+actual desktop dimensions since it should exclude "reserved" areas like struts and taskbars.
+<br><br></p>
+<a name="get_desk_geom"></a><hr><h3><tt>get_desk_geom (desk)</tt></h3>
+<p>
+Returns a table containing the <tt><b>x</b></tt>, <tt><b>y</b></tt>,
+<tt><b>w</b></tt> and <tt><b>h</b></tt> values of the overall dimensions
+for the desktop at index <tt><b>desk</b></tt>. 
+<br><br></p>
+<a name="set_desk_vport"></a><hr><h3><tt>set_desk_vport (desk,x,y)</tt></h3>
+<p>
+Sets the top left coordinates of the desktop (if supported).
+<br><br></p>
+<a name="set_desk_geom"></a><hr><h3><tt>set_desk_geom (desk,w,h)</tt></h3>
+<p>
+Sets the width and height of the desktop (if supported).
+<br><br></p>
+<a name="set_showing_desk"></a><hr><h3><tt>set_showing_desk (showing)</tt></h3>
+<p>
+Sets the window manager's _NET_SHOWING_DESKTOP property (if supported).
+<br><br></p>
+<a name="get_showing_desk"></a><hr><h3><tt>get_showing_desk ()</tt></h3>
+<p>
+Returns the window manager's _NET_SHOWING_DESKTOP property (if supported).
+<br><br></p>
+
+<a name="set_selection"></a><hr><h3><tt>set_selection (text [,mode [,utf8]] )</tt></h3>
+<p>
+Pushes the <tt><b>text</b></tt> into the X selection, clipboard, or cut buffer.</p><p>
+The <tt><b>mode</b></tt> argument determines where the text is sent, and can be one of:
+<br>
+<tt>&nbsp;  "p" </tt>: The primary selection (default).<br>
+<tt>&nbsp;  "s" </tt>: The secondary selection.<br>
+<tt>&nbsp;  "c" </tt>: The clipboard.<br>
+<tt>&nbsp;  "b" </tt>: The cut buffer.<br>
+</p><p>
+If the optional <tt><b>utf8 </b></tt> argument is <i>true</i>, the text 
+is considered to be in UTF-8 format.
+</p><p>
+<b>Note:</b> For all modes except <tt><b>"b"</b></tt> this function is <i>blocking</i>, 
+and will not return until another application requests the text or steals the selection.
+<br><br></p>
+
+
+<a name="get_selection"></a><hr><h3><tt>get_selection ( [mode [,utf8]] )</tt></h3>
+<p>
+Retreives text from X selection, clipboard, or cut buffer.</p><p>
+The <tt><b>mode</b></tt> argument determines which item is requested,
+as described in the <tt>set_selection()</tt> function.</p><p>
+If the optional <tt><b>utf8 </b></tt> argument is <i>true</i>, the text 
+is requested to be in UTF-8 format.
+<br><br></p>
+
+
+<a name="send_keys"></a><hr><h3><tt>send_keys (win,keys)</tt></h3>
+<p>Sends a series of keystrokes to the specified window, as if they were typed on the keyboard.</p><p>
+Most printable characters are passed verbatim, but the following sequences are special:<br><br>
+<table summary="send_keys escape sequences" border="1" width="80%">
+<tr><td>\n</td><td>The &nbsp;<b>Enter</b>&nbsp; key.</td></tr>
+<tr><td>\t</td><td>The &nbsp;<b>Tab</b>&nbsp; key.</td></tr>
+<tr><td>\27</td><td>The &nbsp;<b>Esc</b>&nbsp; key.</td></tr>
+<tr><td>\b</td><td>The &nbsp;<b>Backspace</b>&nbsp; key.</td></tr>
+<tr><td>^</td><td>The next key is passed with the &nbsp;<b>Ctrl</b>&nbsp; key pressed.</td></tr>
+<tr><td>~</td><td>The next key is passed with the &nbsp;<b>Alt</b>&nbsp; key pressed.</td></tr>
+<tr><td>+</td><td>The next key is passed with the &nbsp;<b>Shift</b>&nbsp; key pressed.</td></tr>
+<tr><td>%^</td><td>A literal &nbsp;<b>^</b> </td></tr>
+<tr><td>%~</td><td>A literal &nbsp;<b>~</b> </td></tr>
+<tr><td>%+</td><td>A literal &nbsp;<b>+</b> </td></tr>
+<tr><td>%%</td><td>A literal &nbsp;<b>%</b> </td></tr>
+<tr><td>%Fxx</td><td>A function key, where xx is &nbsp;<tt><b>01</b></tt> &nbsp;thru&nbsp; <tt><b>12</b></tt></td></tr>
+<tr><td>%.</td><td>The &nbsp;<b>Delete</b>&nbsp; key.</td></tr>
+<tr><td>%0</td><td>The &nbsp;<b>Insert</b>&nbsp; key.</td></tr>
+<tr><td>%1</td><td>The &nbsp;<b>End</b>&nbsp; key.</td></tr>
+<tr><td>%2</td><td>The &nbsp;<b>Down</b>&nbsp; arrow key.</td></tr>
+<tr><td>%3</td><td>The &nbsp;<b>PageDown</b>&nbsp; key.</td></tr>
+<tr><td>%4</td><td>The &nbsp;<b>Left</b>&nbsp; arrow key.</td></tr>
+<tr><td>%6</td><td>The &nbsp;<b>Right</b>&nbsp; arrow key.</td></tr>
+<tr><td>%7</td><td>The &nbsp;<b>Home</b>&nbsp; key.</td></tr>
+<tr><td>%8</td><td>The &nbsp;<b>Up</b>&nbsp; arrow key.</td></tr>
+<tr><td>%9</td><td>The &nbsp;<b>PageUp</b>&nbsp; key.</td></tr>
+</table>
+<p>Hint: Key sequences for the delete, insert and navigation keys correspond to the alternate 
+functions of the numeric keypad on a standard U.S. keyboard.</p>
+<p>
+Since this function only sends keystrokes to the application's top-level window, complex 
+applications with nested widgets and cascading menus might not exhibit consistent results.
+<br><br></p>
+<a name="do_events"></a><hr><h3><tt>do_events ( [count] )</tt></h3>
+<p>
+Causes the library to sleep for approximately one-tenth of a second, and then sends an <tt><b>XSync()</b></tt> 
+message to the display, which flushes the event queue and waits until all requests have been 
+received and processed by the X server. This process is performed <tt><b><i>count</i></b></tt> 
+number of times (default: once).
+<br><br></p>
+<a name="convert_locale"></a><hr><h3><tt>convert_locale (str,from,to)</tt></h3>
+<p>
+Converts the string <tt><b><i>str</i></b></tt> from its original encoding <tt><b><i>from</i></b></tt> 
+into the new encoding <tt><b><i>to</i></b></tt> and returns the new string.
+<br><br></p>
+
+<hr>
+<br><br><br><br><br><br><br>
+</body>
+</html>
