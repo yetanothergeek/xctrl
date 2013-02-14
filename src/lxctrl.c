@@ -404,7 +404,10 @@ static int lwmc_get_win_client(lua_State *L)
     } else {
       return lwmc_failure(L,"unknown client");
     }
-  } else { return 2; }
+  } else {
+    if (cm) { free(cm); }
+    return 2;
+  }
 }
 
 
@@ -702,6 +705,7 @@ static int lwmc_get_selection(lua_State *L)
   uchar*sel=get_selection(ud->dpy, kind[0], utf8);
   if (sel) {
     lua_pushstring(L, (char*)sel);
+    free(sel);
     return 1;
   }
   return 0;
