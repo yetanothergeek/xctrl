@@ -1221,6 +1221,7 @@ XCTRL_API uchar* get_selection(Display* dpy, char kind, Bool utf8)
   uchar *sel_buf=NULL;  /* buffer for selection data */
   ulong sel_len = 0;  /* length of sel_buf */
   XEvent evt;      /* X Event Structures */
+  uchar*result=NULL;       /* null-terminated copy of sel_buf */
   uint context = XCLIB_XCOUT_NONE;
   Window win = make_selection_window(dpy);
   Atom seltype = selarg_to_seltype(dpy,kind);
@@ -1239,15 +1240,12 @@ XCTRL_API uchar* get_selection(Display* dpy, char kind, Bool utf8)
       if (context == XCLIB_XCOUT_NONE) { break; }
     }
   }
-  if (sel_len) {
-    if (seltype == XA_STRING) {
-      uchar*tmp=(uchar*)calloc(sel_len+1,1);
-      strncpy((char*)tmp, (char*)sel_buf, sel_len);
-      XFree(sel_buf);
-      sel_buf=tmp;
-    }
-    sel_buf[sel_len]='\0';
+  if (sel_buf) {
+    result=(uchar*)calloc(sel_len+1,1);
+    strncpy((char*)result, (char*)sel_buf, sel_len);
+    result[sel_len]='\0';
+    if (seltype == XA_STRING) { XFree(sel_buf); } else { free(sel_buf); }
   }
   XDestroyWindow(dpy,win);
-  return sel_buf;
+  return result;
 }
