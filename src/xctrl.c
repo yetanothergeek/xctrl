@@ -182,6 +182,7 @@ XCTRL_API void init_charset(Bool force_utf8, char*charset)
 static Bool client_msg(Display *disp, Window win, char *msg, ulong d0, ulong d1, ulong d2, ulong d3, ulong d4) {
   XEvent event;
   long mask = SubstructureRedirectMask | SubstructureNotifyMask;
+  event.type = ClientMessage;
   event.xclient.type = ClientMessage;
   event.xclient.serial = 0;
   event.xclient.send_event = True;
