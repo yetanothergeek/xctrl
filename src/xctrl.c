@@ -265,7 +265,7 @@ static char* get_prop_utf8(Display *disp, Window win, const char*what)
   char*tmp=get_prop(disp, win, GetUTF8Atom(), what, NULL);
   if (!tmp) {
     name_is_utf8 = False;
-    result = get_prop(disp, win, XA_STRING, what, NULL);
+    tmp = get_prop(disp, win, XA_STRING, what, NULL);
   }
   result=get_output_str(tmp, name_is_utf8);
   sfree(tmp);
