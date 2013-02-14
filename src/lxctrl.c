@@ -103,9 +103,9 @@ static int lwmc_new(lua_State *L)
     luaL_getmetatable(L, XCTRL_META_NAME);
     lua_setmetatable(L, -2);
     wm->old_err_handler=XSetErrorHandler(lwmc_handle_error);
-    if (lua_gettop(L)>0) {
-      int force_utf8=lua_toboolean(L,1);
-      const char*charset=luaL_optstring(L,2,NULL);
+    if (lua_gettop(L)>1) {
+      int force_utf8=lua_toboolean(L,2);
+      const char*charset=luaL_optstring(L,3,NULL);
       if (charset) { wm->charset=strdup(charset); }
       init_charset(force_utf8,wm->charset);
     }
