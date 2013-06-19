@@ -725,7 +725,7 @@ static int lwmc_set_selection(lua_State *L)
 
 
 
-static const struct luaL_reg lwmc_funcs[] = {
+static const struct luaL_Reg lwmc_funcs[] = {
   {"new",             lwmc_new},
   {"get_win_list",    lwmc_get_win_list},
   {"get_win_title",   lwmc_get_win_title},
@@ -778,18 +778,20 @@ int luaopen_xctrl(lua_State *L)
   lua_pushvalue(L, -2);
   lua_settable(L, -3);
 
-  luaL_getmetatable(L, XCTRL_META_NAME);
   lua_pushstring(L,"__gc");
   lua_pushcfunction(L,lwmc_gc);
   lua_rawset(L,-3);
 
-  luaL_getmetatable(L, XCTRL_META_NAME);
   lua_pushstring(L,"__tostring");
   lua_pushcfunction(L,lwmc_tostring);
   lua_rawset(L,-3);
 
+#if LUA_VERSION_NUM < 502
   luaL_register(L, NULL, &lwmc_funcs[1]);
   luaL_register(L, XCTRL_META_NAME, lwmc_funcs);
-  return 0;
+#else
+  luaL_setfuncs(L,lwmc_funcs,0);
+#endif
+  return 1;
 }
 

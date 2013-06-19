@@ -8,7 +8,7 @@ INSTALL=install
 DESTDIR=`${LUA} -e 'p=package.cpath:gsub(".-(/[^;]+/).*","%1");print(p)'`
 
 WARN_FLAGS=-Wall -pedantic -Wshadow -Wunused -Wbad-function-cast -Wmissing-prototypes
-VERSION=1.08a
+VERSION=1.09
 
 CFLAGS= ${EXTRA_CFLAGS} -Wall -DVERSION=\"$(VERSION)\"
 LDFLAGS=${EXTRA_LDFLAGS} -lX11 -lXmu
