@@ -2,8 +2,10 @@ DLL_EXT=.so
 LIBNAME=libxctrl${DLL_EXT}
 MODNAME=xctrl${DLL_EXT}
 
+LUA=lua
+
 INSTALL=install
-DESTDIR=`lua -e  'p=package.cpath:gsub("^.-;(.-)%?.*$$", "%1");print(p)'`
+DESTDIR=`${LUA} -e 'p=package.cpath:gsub(".-(/[^;]+/).*","%1");print(p)'`
 
 WARN_FLAGS=-Wall -pedantic -Wshadow -Wunused -Wbad-function-cast -Wmissing-prototypes
 VERSION=1.08a
