@@ -11,6 +11,21 @@ clients, some functionality might be missing in some environments.
 To build the Lua module, simply type "make" from the top-level directory,
 and "make install" to install install it in Lua's package.cpath.
 
+By default, the Makefile will use the first lua headers it can find. If your
+Lua headers are installed somewhere else, you can do something like:
+
+  % make EXTRA_CFLAGS=-I/usr/include/lua5.1
+ 
+"make install" will use your "lua" executable to parse the package.cpath.
+If your Lua executable has another name, specify the name as LUA= when
+you install:
+
+  % make install LUA=lua5.1
+
+You can also specify a non-standard install path with DESTDIR=
+
+  % make install DESTDIR=~/my-lua-modules
+
 By default the Makefile builds a stripped library optimized for size,
 but you can disable optimizations and retain debugging information by
 using "make DEBUG=1"
