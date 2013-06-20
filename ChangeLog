@@ -1,5 +1,20 @@
+##########################################################
+#  NOTE: This is only a rough summary. For a more 
+#  detailed list of changes, see the git log.
+##########################################################
+
+2013-06-19:
+  Lua 5.2 compatibility
+
+2013-02-14:
+    Various bug fixes
+
+2011-10-15:
+  Created git repo on googlecode
+
 2010-10-26:
   Documentation fixes, renamed "lwmctrl.html" to "lxctrl.html"
 
 2010-10-22:
   Initial public release
+
