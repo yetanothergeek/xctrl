@@ -59,7 +59,7 @@ another new object. This will help insure that the first instance is properly cl
 <td>-- Change a window's state to iconic.</td></tr>
 <tr class="even"><td class="func"><a href="#set_win_state">set_win_state (win,mode,p1 [,p2])</a></td>
 <td>-- Change a window's state properties.</td></tr>
-<tr class="odd"><td class="func"><a href="#set_win_geom">set_win_geom (win,x,y,w,h)</a></td>
+<tr class="odd"><td class="func"><a href="#set_win_geom">set_win_geom (win,[x,y,w,h]|[t][,g])</a></td>
 <td>-- Move and/or resize a window</td></tr>
 <tr class="even"><td class="func"><a href="#get_win_geom">get_win_geom ()</a></td>
 <td>-- Get a window's size and position</td></tr>
@@ -181,16 +181,38 @@ and
               
 
 <br><br></p>
-<a name="set_win_geom"></a><hr><h3><tt>set_win_geom (win,x,y,w,h)</tt></h3>
+<a name="set_win_geom"></a><hr><h3><tt>set_win_geom (win,[x,y,w,h]|[t][,g])</tt></h3>
 <p>
 Adjust the location and/or size of the window.
-If the <tt><b>x</b></tt> or <tt><b>y</b></tt> arguments are negative, they are ignored and 
-only the size is adjusted. Likewise, if the <tt><b>w</b></tt> or <tt><b>h</b></tt> arguments
-are negative, they are ignored and only the position is adjusted.
+</p><p>
+The <tt><b> x</b></tt>, <tt><b>y</b></tt>, <tt><b>w</b></tt>, <tt><b>h </b></tt> arguments
+are usually integers, but any of them may be <tt><b>nil</b></tt>, in which case that value 
+will be ignored (i.e. unchanged.)
+</p><p>
+For the alternate form, <tt><b>t</b></tt> is a table in the same format as returned 
+by <tt><b>get_win_geom()</b></tt>.</p><p>
+Thus the following two calls are equivalent:<br>
+<tt>&nbsp; set_win_geom(win, 32, 64, 640, 480)</tt><br>
+<tt>&nbsp; set_win_geom(win, {x=32,y=64,w=640,h=480})</tt>
+</p><p>
+The final argument <tt><b>g</b></tt> is optional and specifies the "gravity" (direction) of 
+a resize operation.<br>
+If present, it must be one of the following strings:<br>&nbsp;
+<tt><b>"default"</b></tt>,
+<tt><b>"northwest"</b></tt>,
+<tt><b>"north"</b></tt>,
+<tt><b>"northeast"</b></tt>,
+<tt><b>"west"</b></tt>,
+<tt><b>"center"</b></tt>,
+<tt><b>"east"</b></tt>,
+<tt><b>"southwest"</b></tt>,
+<tt><b>"south"</b></tt>,
+<tt><b>"southeast"</b></tt>,
+<tt><b>"static"</b></tt>
 <br><br></p>
 <a name="get_win_geom"></a><hr><h3><tt>get_win_geom ()</tt></h3>
 <p>
-If sucessful, returns a table containing the <tt><b>x</b></tt>, <tt><b>y</b></tt>,
+If successful, returns a table containing the <tt><b>x</b></tt>, <tt><b>y</b></tt>,
 <tt><b>w</b></tt> and <tt><b>h</b></tt> values of the specified window.</p><p>
 On failure, returns <tt><b>nil</b></tt> plus an error message.
 <br><br></p>

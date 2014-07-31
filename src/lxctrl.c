@@ -266,14 +266,79 @@ static int lwmc_set_win_title(lua_State*L)
 
 static int lwmc_set_win_geom(lua_State*L)
 {
+  static const char*gravities[] = {
+    "default",
+    "northwest",
+    "north",
+    "northeast",
+    "west",
+    "center",
+    "east",
+    "southwest",
+    "south",
+    "southeast",
+    "static",
+     NULL
+  };
   XCtrl*ud=lwmc_check_obj(L);
   Window win=check_window(L,ud,2);
-  long x=luaL_checknumber(L,3);
-  long y=luaL_checknumber(L,4);
-  long w=luaL_checknumber(L,5);
-  long h=luaL_checknumber(L,6);
-  long g=luaL_optnumber(L,7,0);
-  if (set_window_geom(ud->dpy, win, g,x,y,w,h)) {
+  long x=0,y=0,w=1,h=1,g=0;
+  long flags=0;
+  int narg=lua_gettop(L);
+  if (lua_istable(L,3)) {
+    if (narg>=4) { g=luaL_checkoption(L,4,NULL,gravities); }
+    lua_pushnil(L);  /* make room for first key */
+    while (lua_next(L, 3) != 0) { /* walk the table */
+      if (lua_type(L, -2)==LUA_TSTRING) { /* 'key' is at index -2 */
+        const char*key=lua_tostring(L,-2);
+        if ( key && key[0] && (!key[1]) && (lua_type(L, -1)==LUA_TNUMBER)) {
+          long value=lua_tonumber(L,-1); /* 'value' is at index -1 */
+          switch (key[0]) {
+            case 'x': {
+              x=value;
+              flags|=XCTRL_GEOM_USE_X;
+              break;
+            }
+            case 'y': {
+              y=value;
+              flags|=XCTRL_GEOM_USE_Y;
+              break;
+            }
+            case 'w': {
+              w=value;
+              flags|=XCTRL_GEOM_USE_W;
+              break;
+            }
+            case 'h': {
+              h=value;
+              flags|=XCTRL_GEOM_USE_H;
+              break;
+            }
+          }
+        }
+      }
+      lua_pop(L, 1);
+    }
+  } else {
+    if (!lua_isnil(L,3)) {
+      x=luaL_checknumber(L,3);
+      flags|=XCTRL_GEOM_USE_X;
+    }
+    if (narg>=4&&!lua_isnil(L,4)) {
+      y=luaL_checknumber(L,4);
+      flags|=XCTRL_GEOM_USE_Y;
+    }
+    if (narg>=5&&!lua_isnil(L,5)) {
+      w=luaL_checknumber(L,5);
+      flags|=XCTRL_GEOM_USE_W;
+    }
+    if (narg>=6&&!lua_isnil(L,6)) {
+      h=luaL_checknumber(L,6);
+      flags|=XCTRL_GEOM_USE_H;
+    }
+    if (narg>=7) { g=luaL_checkoption(L,7,NULL,gravities); }
+  }
+  if (set_window_geom(ud->dpy,win,g,flags,x,y,w,h)) {
     return lwmc_failure(L,"move/resize failed");
   } else if (lwmc_success(L,ud)) {
     lua_pushboolean(L,True);
@@ -773,6 +838,7 @@ int luaopen_xctrl(lua_State*L);
 
 int luaopen_xctrl(lua_State*L)
 {
+fprintf(stderr,"TESTING!!!\n");
   luaL_newmetatable(L, XCTRL_META_NAME);
   lua_pushstring(L, "__index");
   lua_pushvalue(L, -2);

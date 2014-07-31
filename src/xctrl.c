@@ -533,23 +533,35 @@ XCTRL_API void get_window_geom(Display*disp, Window win, Geometry*geom)
 
 
 
-XCTRL_API int set_window_geom(Display*disp, Window win, long grav, long x, long y, long w, long h)
+
+
+
+XCTRL_API int set_window_geom(Display*disp, Window win, long grav, long flags, long x, long y, long w, long h)
 {
-  ulong grflags = grav;
-  if (x != -1) grflags |= (1 << 8);
-  if (y != -1) grflags |= (1 << 9);
-  if (w != -1) grflags |= (1 << 10);
-  if (h != -1) grflags |= (1 << 11);
   if (wm_supports(disp, "_NET_MOVERESIZE_WINDOW")) {
     return client_msg( disp, win, "_NET_MOVERESIZE_WINDOW",
-                       grflags, (ulong)x, (ulong)y, (ulong)w, (ulong)h);
+                       grav|flags, (ulong)x, (ulong)y, (ulong)w, (ulong)h);
   } else {
-    if ((w < 1 || h < 1) && (x >= 0 && y >= 0)) {
-      XMoveWindow(disp, win, x, y);
-    } else if ((x < 0 || y < 0) && (w >= 1 && h >= -1)) {
-      XResizeWindow(disp, win, w, h);
-    } else if (x >= 0 && y >= 0 && w >= 1 && h >= 1) {
+    Bool move=False;
+    Bool size=False;
+    Geometry geom;
+    get_window_geom(disp,win,&geom);
+    if (flags&(XCTRL_GEOM_USE_X|XCTRL_GEOM_USE_Y)) {
+      move=True;
+      if (!(flags&XCTRL_GEOM_USE_X)) { x=geom.x; }
+      if (!(flags&XCTRL_GEOM_USE_Y)) { y=geom.y; }
+    }
+    if (flags&(XCTRL_GEOM_USE_W|XCTRL_GEOM_USE_H)) {
+      size=True;
+      if (!(flags&XCTRL_GEOM_USE_W)) { w=geom.w; }
+      if (!(flags&XCTRL_GEOM_USE_H)) { h=geom.h; }
+    }
+    if (size&&move) {
       XMoveResizeWindow(disp, win, x, y, w, h);
+    } else if (size) {
+      XResizeWindow(disp, win, w, h);
+    } else if (move) {
+      XMoveWindow(disp, win, x, y); 
     }
     return True;
   }

@@ -49,6 +49,12 @@ typedef unsigned int uint;
 #define _NET_WM_STATE_TOGGLE        2    /* toggle property  */
 
 
+#define XCTRL_GEOM_USE_X (1 << 8)
+#define XCTRL_GEOM_USE_Y (1 << 9)
+#define XCTRL_GEOM_USE_W (1 << 10)
+#define XCTRL_GEOM_USE_H (1 << 11)
+
+
 typedef struct _Geometry {
   int x;
   int y;
@@ -82,7 +88,7 @@ XCTRL_API char* get_window_class(Display*disp, Window win);
 XCTRL_API char* get_window_title(Display*disp, Window win);
 XCTRL_API void set_window_title(Display*disp, Window win, const char*title, char mode);
 
-XCTRL_API int set_window_geom(Display*disp, Window win, long grav, long x, long y, long w, long h);
+XCTRL_API int set_window_geom(Display*disp, Window win, long grav, long flags, long x, long y, long w, long h);
 XCTRL_API void get_window_geom(Display*disp,  Window win, Geometry*geom);
 
 XCTRL_API int send_window_to_desktop(Display*disp, Window win, int desktop);
