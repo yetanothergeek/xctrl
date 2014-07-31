@@ -90,6 +90,7 @@ XCTRL_API void set_window_title(Display*disp, Window win, const char*title, char
 
 XCTRL_API int set_window_geom(Display*disp, Window win, long grav, long flags, long x, long y, long w, long h);
 XCTRL_API void get_window_geom(Display*disp,  Window win, Geometry*geom);
+XCTRL_API Bool get_window_frame(Display*disp, Window win, long*left, long*right, long*top, long*bottom);
 
 XCTRL_API int send_window_to_desktop(Display*disp, Window win, int desktop);
 XCTRL_API long get_desktop_of_window(Display*disp, Window win);
@@ -121,6 +122,7 @@ XCTRL_API Window supporting_wm_check(Display*disp);
 XCTRL_API char* get_wm_name(Display*disp);
 XCTRL_API char* get_wm_class(Display*disp);
 XCTRL_API ulong get_wm_pid(Display*disp);
+XCTRL_API Bool wm_supports(Display*disp, const char*prop);
 
 XCTRL_API void set_selection(Display*dpy, char kind, char*sel_buf, Bool utf8);
 XCTRL_API uchar* get_selection(Display* dpy, char kind, Bool utf8);

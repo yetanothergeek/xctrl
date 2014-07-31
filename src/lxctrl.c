@@ -556,6 +556,31 @@ static int lwmc_get_win_geom(lua_State*L) {
 }
 
 
+static int lwmc_get_win_frame(lua_State*L)
+{ 
+  XCtrl*ud=lwmc_check_obj(L);
+  Window win=check_window(L,ud,2);
+  long left=0, right=0, top=0, bottom=0;
+  if (!wm_supports(ud->dpy,"_NET_FRAME_EXTENTS")) {
+    return lwmc_failure(L,"Unsupported window manager feature");
+  }
+  if (get_window_frame(ud->dpy, win, &left, &right, &top, &bottom)) {
+  if (lwmc_success(L,ud)) {
+    lua_newtable(L);
+    SetTableNum("l", left);
+    SetTableNum("r", right);
+    SetTableNum("t", top);
+    SetTableNum("b", bottom);
+    return 1;
+  } else {
+    return 2;    
+  }
+  } else {
+    return lwmc_failure(L,"Could not determine frame extents");
+  }
+}
+
+
 
 static int lwmc_get_workarea(lua_State*L) {
   XCtrl*ud=lwmc_check_obj(L);
@@ -801,6 +826,7 @@ static const struct luaL_Reg lwmc_funcs[] = {
   {"set_win_state",   lwmc_set_win_state},
   {"set_win_geom",    lwmc_set_win_geom},
   {"get_win_geom",    lwmc_get_win_geom},
+  {"get_win_frame",   lwmc_get_win_frame},
   {"get_active_win",  lwmc_get_active_win},
   {"pick_win",        lwmc_pick_win},
   {"root_win",        lwmc_root_win},

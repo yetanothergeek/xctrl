@@ -61,65 +61,67 @@ another new object. This will help insure that the first instance is properly cl
 <td>-- Change a window's state properties.</td></tr>
 <tr class="odd"><td class="func"><a href="#set_win_geom">set_win_geom (win,[x,y,w,h]|[t][,g])</a></td>
 <td>-- Move and/or resize a window</td></tr>
-<tr class="even"><td class="func"><a href="#get_win_geom">get_win_geom ()</a></td>
+<tr class="even"><td class="func"><a href="#get_win_geom">get_win_geom (win)</a></td>
 <td>-- Get a window's size and position</td></tr>
-<tr class="odd"><td class="func"><a href="#get_active_win">get_active_win ()</a></td>
+<tr class="odd"><td class="func"><a href="#get_win_frame">get_win_frame (win)</a></td>
+<td>-- Get the extents of a window's frame</td></tr>
+<tr class="even"><td class="func"><a href="#get_active_win">get_active_win ()</a></td>
 <td>-- Get the id of the currently active window.</td></tr>
-<tr class="even"><td class="func"><a href="#pick_win">pick_win ( [button] )</a></td>
+<tr class="odd"><td class="func"><a href="#pick_win">pick_win ( [button] )</a></td>
 <td>-- Get the id of a window by clicking it with the mouse.</td></tr>
-<tr class="odd"><td class="func"><a href="#root_win">root_win ()</a></td>
+<tr class="even"><td class="func"><a href="#root_win">root_win ()</a></td>
 <td>-- Get the id of the display's root window.</td></tr>
-<tr class="even"><td class="func"><a href="#set_desk_of_win">set_desk_of_win (win,desk)</a></td>
+<tr class="odd"><td class="func"><a href="#set_desk_of_win">set_desk_of_win (win,desk)</a></td>
 <td>-- Move a window onto another desktop.</td></tr>
-<tr class="odd"><td class="func"><a href="#get_desk_of_win">get_desk_of_win (win)</a></td>
+<tr class="even"><td class="func"><a href="#get_desk_of_win">get_desk_of_win (win)</a></td>
 <td>-- Get the index of a window's desktop.</td></tr>
-<tr class="even"><td class="func"><a href="#get_pid_of_win">get_pid_of_win (win)</a></td>
+<tr class="odd"><td class="func"><a href="#get_pid_of_win">get_pid_of_win (win)</a></td>
 <td>-- Get the process id of a window.</td></tr>
-<tr class="odd"><td class="func"><a href="#close_win">close_win (win)</a></td>
+<tr class="even"><td class="func"><a href="#close_win">close_win (win)</a></td>
 <td>-- Try to close a window gracefully.</td></tr>
-<tr class="even"><td class="func"><a href="#get_win_client">get_win_client (win)</a></td>
+<tr class="odd"><td class="func"><a href="#get_win_client">get_win_client (win)</a></td>
 <td>-- Get a window's client machine name.</td></tr>
-<tr class="odd"><td class="func"><a href="#get_num_desks">get_num_desks ()</a></td>
+<tr class="even"><td class="func"><a href="#get_num_desks">get_num_desks ()</a></td>
 <td>-- Get the total number of desktops.</td></tr>
-<tr class="even"><td class="func"><a href="#set_num_desks">set_num_desks ()</a></td>
+<tr class="odd"><td class="func"><a href="#set_num_desks">set_num_desks ()</a></td>
 <td>-- Set the total number of desktops.</td></tr>
-<tr class="odd"><td class="func"><a href="#get_curr_desk">get_curr_desk ()</a></td>
+<tr class="even"><td class="func"><a href="#get_curr_desk">get_curr_desk ()</a></td>
 <td>-- Get the index of the current active desktop.</td></tr>
-<tr class="even"><td class="func"><a href="#set_curr_desk">set_curr_desk (desk)</a></td>
+<tr class="odd"><td class="func"><a href="#set_curr_desk">set_curr_desk (desk)</a></td>
 <td>-- Switch to another desktop</td></tr>
-<tr class="odd"><td class="func"><a href="#get_display">get_display ()</a></td>
+<tr class="even"><td class="func"><a href="#get_display">get_display ()</a></td>
 <td>-- Return the the X11 display name.</td></tr>
-<tr class="even"><td class="func"><a href="#get_wm_win">get_wm_win ()</a></td>
+<tr class="odd"><td class="func"><a href="#get_wm_win">get_wm_win ()</a></td>
 <td>-- Get the window manager's information window.</td></tr>
-<tr class="odd"><td class="func"><a href="#get_wm_name">get_wm_name ()</a></td>
+<tr class="even"><td class="func"><a href="#get_wm_name">get_wm_name ()</a></td>
 <td>-- Get the window manager's name.</td></tr>
-<tr class="even"><td class="func"><a href="#get_wm_class">get_wm_class ()</a></td>
+<tr class="odd"><td class="func"><a href="#get_wm_class">get_wm_class ()</a></td>
 <td>-- Get the window manager's class name.</td></tr>
-<tr class="odd"><td class="func"><a href="#get_wm_pid">get_wm_pid ()</a></td>
+<tr class="even"><td class="func"><a href="#get_wm_pid">get_wm_pid ()</a></td>
 <td>-- Get the window manager's process id.</td></tr>
-<tr class="even"><td class="func"><a href="#get_desk_name">get_desk_name (desk)</a></td>
+<tr class="odd"><td class="func"><a href="#get_desk_name">get_desk_name (desk)</a></td>
 <td>-- Get the name of a desktop.</td></tr>
-<tr class="odd"><td class="func"><a href="#get_workarea">get_workarea (desk)</a></td>
+<tr class="even"><td class="func"><a href="#get_workarea">get_workarea (desk)</a></td>
 <td>-- Get the effective working dimensions of a desktop.</td></tr>
-<tr class="even"><td class="func"><a href="#get_desk_geom">get_desk_geom (desk)</a></td>
+<tr class="odd"><td class="func"><a href="#get_desk_geom">get_desk_geom (desk)</a></td>
 <td>--  Get the overall dimensions of a desktop.</td></tr>
-<tr class="odd"><td class="func"><a href="#set_desk_vport">set_desk_vport (desk,x,y)</a></td>
+<tr class="even"><td class="func"><a href="#set_desk_vport">set_desk_vport (desk,x,y)</a></td>
 <td>-- Set a desktop's viewport x-y coordinates.</td></tr>
-<tr class="even"><td class="func"><a href="#set_desk_geom">set_desk_geom (desk,w,h)</a></td>
+<tr class="odd"><td class="func"><a href="#set_desk_geom">set_desk_geom (desk,w,h)</a></td>
 <td>-- Set a desktop's dimensions.</td></tr>
-<tr class="odd"><td class="func"><a href="#set_showing_desk">set_showing_desk (showing)</a></td>
+<tr class="even"><td class="func"><a href="#set_showing_desk">set_showing_desk (showing)</a></td>
 <td>-- Set window manager's "showing desktop" mode.</td></tr>
-<tr class="even"><td class="func"><a href="#get_showing_desk">get_showing_desk ()</a></td>
+<tr class="odd"><td class="func"><a href="#get_showing_desk">get_showing_desk ()</a></td>
 <td>-- Get window manager's "showing desktop" mode.</td></tr>
-<tr class="odd"><td class="func"><a href="#set_selection">set_selection(text[,mode[,utf8]])</a></td>
+<tr class="even"><td class="func"><a href="#set_selection">set_selection(text[,mode[,utf8]])</a></td>
 <td>-- Push text into X selection, clipboard, or cut buffer.</td></tr>
-<tr class="even"><td class="func"><a href="#get_selection"> get_selection ( [mode [,utf8] )</a></td>
+<tr class="odd"><td class="func"><a href="#get_selection"> get_selection ( [mode [,utf8] )</a></td>
 <td>-- Retreive text from X selection, clipboard, or cut buffer.</td></tr>
-<tr class="odd"><td class="func"><a href="#send_keys">send_keys (win,keys)</a></td>
+<tr class="even"><td class="func"><a href="#send_keys">send_keys (win,keys)</a></td>
 <td>-- Send simulated keyboard actions to a window.</td></tr>
-<tr class="even"><td class="func"><a href="#do_events"> do_events( [count] )</a></td>
+<tr class="odd"><td class="func"><a href="#do_events"> do_events( [count] )</a></td>
 <td>-- Flush the X server's event queue.</td></tr>
-<tr class="odd"><td class="func"><a href="#convert_locale">convert_locale (str,from,to)</a></td>
+<tr class="even"><td class="func"><a href="#convert_locale">convert_locale (str,from,to)</a></td>
 <td>-- Convert string between locales.</td></tr>
 </table>
 <hr>
@@ -210,11 +212,18 @@ If present, it must be one of the following strings:<br>&nbsp;
 <tt><b>"southeast"</b></tt>,
 <tt><b>"static"</b></tt>
 <br><br></p>
-<a name="get_win_geom"></a><hr><h3><tt>get_win_geom ()</tt></h3>
+<a name="get_win_geom"></a><hr><h3><tt>get_win_geom (win)</tt></h3>
 <p>
 If successful, returns a table containing the <tt><b>x</b></tt>, <tt><b>y</b></tt>,
 <tt><b>w</b></tt> and <tt><b>h</b></tt> values of the specified window.</p><p>
 On failure, returns <tt><b>nil</b></tt> plus an error message.
+<br><br></p>
+<a name="get_win_frame"></a><hr><h3><tt>get_win_frame (win)</tt></h3>
+<p>
+If successful, returns a table containing the keys <tt><b>l</b></tt>, <tt><b>r</b></tt>,
+<tt><b>t</b></tt>, <tt><b>b</b></tt> which represent (respectively) the left, right, top, 
+and bottom extents of the frame for the specified window.</p><p>
+On failure, returns <tt><b>nil</b></tt> plus an error message. </p><p>
 <br><br></p>
 <a name="get_active_win"></a><hr><h3><tt>get_active_win ()</tt></h3>
 <p>

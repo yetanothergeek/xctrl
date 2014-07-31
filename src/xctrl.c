@@ -503,7 +503,7 @@ XCTRL_API int set_window_state(Display*disp, Window win, ulong action, const cha
 
 
 
-static Bool wm_supports (Display*disp, const char*prop) {
+XCTRL_API Bool wm_supports (Display*disp, const char*prop) {
   Atom xa_prop = XInternAtom(disp, prop, False);
   ulong size;
   int i;
@@ -533,6 +533,23 @@ XCTRL_API void get_window_geom(Display*disp, Window win, Geometry*geom)
 
 
 
+XCTRL_API Bool get_window_frame(Display*disp, Window win, long*left, long*right, long*top, long*bottom)
+{
+  if (wm_supports(disp, "_NET_FRAME_EXTENTS")) {
+    ulong size=0;
+    ulong*extents=get_uprop(win,"_NET_FRAME_EXTENTS",&size);
+    *left=*right=*top=*bottom=-1;
+    if (extents) {
+      *left=extents[0];
+      *right=extents[1];
+      *top=extents[2];
+      *bottom=extents[3];
+      sfree(extents);
+      return True;
+    }
+  }
+  return False;
+}
 
 
 
