@@ -56,7 +56,7 @@ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #define DEFAULT_CHARSET "ISO_8859-1"
 
-XCTRL_API char* default_charset=DEFAULT_CHARSET; 
+XCTRL_API char* default_charset=DEFAULT_CHARSET;
 
 XCTRL_API Bool envir_utf8;
 
@@ -91,8 +91,8 @@ XCTRL_API char* convert_locale(const char*asrc,const char*from, const char*to)
             if(iconv(cd, &tmp, &tmp_length, &pdst, &out_remain) == (size_t)-1) {
               if (errno != E2BIG) {
                 free(out_base);
-                return NULL; 
-              } else { 
+                return NULL;
+              } else {
                 /* fall thru to E2BIG below */
               }
             } else {  /* The bad char was replaced with SPACE, so skip it. */
@@ -100,7 +100,7 @@ XCTRL_API char* convert_locale(const char*asrc,const char*from, const char*to)
               srclen -= 2;
               break;
             }
-          } else { 
+          } else {
             free(out_base);
             return NULL;
           }
@@ -199,7 +199,7 @@ static Bool client_msg(Display *disp, Window win, char *msg, ulong d0, ulong d1,
 
 
 
-static char *get_output_str(char *str, Bool is_utf8) {
+static char *get_output_str(char*str, Bool is_utf8) {
   char *out;
   if (!str) { return NULL; }
   if (envir_utf8) {
@@ -258,7 +258,7 @@ static char *get_prop(Display*d, Window w, Atom type, const char*name, ulong*siz
 
 
 
-static char* get_prop_utf8(Display *disp, Window win, const char*what)
+static char* get_prop_utf8(Display*disp, Window win, const char*what)
 {
   Bool name_is_utf8 = True;
   char*result=NULL;
@@ -274,7 +274,7 @@ static char* get_prop_utf8(Display *disp, Window win, const char*what)
 
 
 /*
-  Save the value of p, free p, and return the 
+  Save the value of p, free p, and return the
   saved value, or return ifnull if p is NULL.
 */
 static ulong ptr_to_ulong(ulong*p, ulong ifnull)
@@ -290,7 +290,7 @@ static ulong ptr_to_ulong(ulong*p, ulong ifnull)
 
 
 
-XCTRL_API Window supporting_wm_check(Display *disp)
+XCTRL_API Window supporting_wm_check(Display*disp)
 {
   Window *p=(Window*)get_prop(disp, DefRootWin, XA_WINDOW, "_NET_SUPPORTING_WM_CHECK", NULL);
   if (!p) {
@@ -301,7 +301,7 @@ XCTRL_API Window supporting_wm_check(Display *disp)
 
 
 
-XCTRL_API char* get_wm_name(Display *disp)
+XCTRL_API char* get_wm_name(Display*disp)
 {
   Window win = supporting_wm_check(disp);
   return win?get_prop_utf8(disp, win, "_NET_WM_NAME"):NULL;
@@ -309,7 +309,7 @@ XCTRL_API char* get_wm_name(Display *disp)
 
 
 
-XCTRL_API char* get_wm_class(Display *disp)
+XCTRL_API char* get_wm_class(Display*disp)
 {
   Window win = supporting_wm_check(disp);
   return win?get_prop_utf8(disp, win, "WM_CLASS"):NULL;
@@ -317,7 +317,7 @@ XCTRL_API char* get_wm_class(Display *disp)
 
 
 
-XCTRL_API ulong get_wm_pid(Display *disp)
+XCTRL_API ulong get_wm_pid(Display*disp)
 {
   Window win = supporting_wm_check(disp);
   if (win) {
@@ -330,7 +330,7 @@ XCTRL_API ulong get_wm_pid(Display *disp)
 
 
 
-XCTRL_API int get_showing_desktop(Display *disp)
+XCTRL_API int get_showing_desktop(Display*disp)
 {
   ulong *p=get_uprop(DefRootWin, "_NET_SHOWING_DESKTOP", NULL);
   return ptr_to_ulong(p,-1);
@@ -338,33 +338,33 @@ XCTRL_API int get_showing_desktop(Display *disp)
 
 
 
-XCTRL_API int set_showing_desktop(Display *disp, ulong state)
+XCTRL_API int set_showing_desktop(Display*disp, ulong state)
 {
   return client_msg(disp, DefRootWin, "_NET_SHOWING_DESKTOP", state, 0, 0, 0, 0);
 }
 
 
 
-XCTRL_API int change_viewport(Display *disp, ulong x, ulong y) {
+XCTRL_API int change_viewport(Display*disp, ulong x, ulong y) {
   return client_msg(disp, DefRootWin, "_NET_DESKTOP_VIEWPORT", x, y, 0, 0, 0);
 }
 
 
 
-XCTRL_API int change_geometry (Display *disp, ulong x, ulong y) {
+XCTRL_API int change_geometry (Display*disp, ulong x, ulong y) {
   return client_msg(disp, DefRootWin, "_NET_DESKTOP_GEOMETRY", x, y, 0, 0, 0);
 }
 
 
 
-XCTRL_API int set_number_of_desktops(Display *disp, ulong n)
+XCTRL_API int set_number_of_desktops(Display*disp, ulong n)
 {
   return client_msg(disp, DefRootWin, "_NET_NUMBER_OF_DESKTOPS", n, 0, 0, 0, 0);
 }
 
 
 
-XCTRL_API long get_number_of_desktops(Display *disp)
+XCTRL_API long get_number_of_desktops(Display*disp)
 {
   ulong *p;
   p = get_uprop(DefRootWin, "_NET_NUMBER_OF_DESKTOPS", NULL);
@@ -376,13 +376,13 @@ XCTRL_API long get_number_of_desktops(Display *disp)
 
 
 
-XCTRL_API int set_current_desktop(Display *disp, ulong target) {
+XCTRL_API int set_current_desktop(Display*disp, ulong target) {
   return client_msg(disp, DefRootWin, "_NET_CURRENT_DESKTOP", target, 0, 0, 0, 0);
 }
 
 
 
-XCTRL_API long get_current_desktop(Display *disp)
+XCTRL_API long get_current_desktop(Display*disp)
 {
   ulong *p;
   p = get_uprop(DefRootWin, "_NET_CURRENT_DESKTOP", NULL);
@@ -394,14 +394,14 @@ XCTRL_API long get_current_desktop(Display *disp)
 
 
 
-static void replace_prop(Display *disp, Window win, Atom what, Atom type, char*newval)
+static void replace_prop(Display*disp, Window win, Atom what, Atom type, char*newval)
 {
   XChangeProperty(disp,win,what,type,8,PropModeReplace,(unsigned char*)newval,strlen(newval));
 }
 
 
 
-XCTRL_API void set_window_title(Display *disp, Window win, const char *title, char mode) {
+XCTRL_API void set_window_title(Display*disp, Window win, const char*title, char mode) {
   char *title_utf8;
   char *title_local;
   Atom utf8_atom = GetUTF8Atom();
@@ -435,16 +435,16 @@ XCTRL_API void set_window_title(Display *disp, Window win, const char *title, ch
 
 
 
-XCTRL_API int send_window_to_desktop(Display *disp, Window win, int desktop) {
+XCTRL_API int send_window_to_desktop(Display*disp, Window win, int desktop) {
   return client_msg(disp, win, "_NET_WM_DESKTOP", (ulong)desktop, 0, 0, 0, 0);
 }
 
 
 
-XCTRL_API Bool activate_window(Display *disp, Window win, Bool switch_desk) {
+XCTRL_API Bool activate_window(Display*disp, Window win, Bool switch_desk) {
   if (switch_desk) {
     long desktop = get_desktop_of_window(disp,win);
-    if (desktop>=0) { 
+    if (desktop>=0) {
       if (desktop!=get_current_desktop(disp)) {
         set_current_desktop(disp, desktop);
       }
@@ -458,27 +458,27 @@ XCTRL_API Bool activate_window(Display *disp, Window win, Bool switch_desk) {
 
 
 
-XCTRL_API Bool iconify_window(Display *disp, Window win)
+XCTRL_API Bool iconify_window(Display*disp, Window win)
 {
   return XIconifyWindow(disp, win, DefaultScreen(disp))?True:False;
 }
 
 
 
-XCTRL_API Window get_active_window(Display *disp) {
+XCTRL_API Window get_active_window(Display*disp) {
   Window*win = (Window*)get_prop(disp, DefRootWin, XA_WINDOW, "_NET_ACTIVE_WINDOW", NULL);
   return (Window) ptr_to_ulong((ulong*)win,0);
 }
 
 
 
-XCTRL_API int close_window(Display *disp, Window win) {
+XCTRL_API int close_window(Display*disp, Window win) {
   return client_msg(disp, win, "_NET_CLOSE_WINDOW", 0, 0, 0, 0, 0);
 }
 
 
 
-static ulong wm_state_atom(Display *disp, const char*prop) {
+static ulong wm_state_atom(Display*disp, const char*prop) {
   Atom atom=0;
   char tmp_prop[64];
   char*p;
@@ -494,8 +494,8 @@ static ulong wm_state_atom(Display *disp, const char*prop) {
 
 
 
-XCTRL_API int set_window_state(Display *disp, Window win, ulong action, const char*p1, const char*p2)
-{  
+XCTRL_API int set_window_state(Display*disp, Window win, ulong action, const char*p1, const char*p2)
+{
   ulong xa_prop1=p1?wm_state_atom(disp,p1):0;
   ulong xa_prop2=p2?wm_state_atom(disp,p2):0;
   return client_msg(disp,win,"_NET_WM_STATE",action,xa_prop1,xa_prop2, 0, 0);
@@ -503,7 +503,7 @@ XCTRL_API int set_window_state(Display *disp, Window win, ulong action, const ch
 
 
 
-static Bool wm_supports (Display *disp, const char *prop) {
+static Bool wm_supports (Display*disp, const char*prop) {
   Atom xa_prop = XInternAtom(disp, prop, False);
   ulong size;
   int i;
@@ -521,7 +521,7 @@ static Bool wm_supports (Display *disp, const char *prop) {
 
 
 
-XCTRL_API void get_window_geom(Display *disp, Window win, Geometry*geom)
+XCTRL_API void get_window_geom(Display*disp, Window win, Geometry*geom)
 {
   int x, y;
   unsigned int bw, depth;
@@ -533,7 +533,7 @@ XCTRL_API void get_window_geom(Display *disp, Window win, Geometry*geom)
 
 
 
-XCTRL_API int set_window_geom(Display *disp, Window win, long grav, long x, long y, long w, long h)
+XCTRL_API int set_window_geom(Display*disp, Window win, long grav, long x, long y, long w, long h)
 {
   ulong grflags = grav;
   if (x != -1) grflags |= (1 << 8);
@@ -541,7 +541,7 @@ XCTRL_API int set_window_geom(Display *disp, Window win, long grav, long x, long
   if (w != -1) grflags |= (1 << 10);
   if (h != -1) grflags |= (1 << 11);
   if (wm_supports(disp, "_NET_MOVERESIZE_WINDOW")) {
-    return client_msg( disp, win, "_NET_MOVERESIZE_WINDOW", 
+    return client_msg( disp, win, "_NET_MOVERESIZE_WINDOW",
                        grflags, (ulong)x, (ulong)y, (ulong)w, (ulong)h);
   } else {
     if ((w < 1 || h < 1) && (x >= 0 && y >= 0)) {
@@ -557,7 +557,7 @@ XCTRL_API int set_window_geom(Display *disp, Window win, long grav, long x, long
 
 
 
-XCTRL_API Window *get_window_list(Display *disp, ulong*size)
+XCTRL_API Window *get_window_list(Display*disp, ulong*size)
 {
   Window *client_list;
   client_list = (Window*)get_prop(disp, DefRootWin, XA_WINDOW, "_NET_CLIENT_LIST", size);
@@ -569,7 +569,7 @@ XCTRL_API Window *get_window_list(Display *disp, ulong*size)
 
 
 
-XCTRL_API char *get_window_class (Display *disp, Window win)
+XCTRL_API char *get_window_class (Display*disp, Window win)
 {
   char *class_utf8;
   char *wm_class;
@@ -588,7 +588,7 @@ XCTRL_API char *get_window_class (Display *disp, Window win)
 
 
 
-XCTRL_API char *get_window_title (Display *disp, Window win)
+XCTRL_API char *get_window_title (Display*disp, Window win)
 {
   char *wm_name = get_prop(disp, win, GetUTF8Atom(), "_NET_WM_NAME", NULL);
   if (wm_name) {
@@ -608,7 +608,7 @@ XCTRL_API char *get_window_title (Display *disp, Window win)
 
 
 
-static void pass_click_to_client(Display *disp, Window root, XEvent *event, int mask, Cursor cursor)
+static void pass_click_to_client(Display*disp, Window root, XEvent*event, int mask, Cursor cursor)
 {
   usleep(1000);
   XSync(disp,False);
@@ -625,7 +625,7 @@ static void pass_click_to_client(Display *disp, Window root, XEvent *event, int 
 
 
 /* Routine to let user select a window using the mouse adapted from xfree86. */
-XCTRL_API Window select_window(Display *disp, int button)
+XCTRL_API Window select_window(Display*disp, int button)
 {
   Cursor cursor;
   XEvent event;
@@ -671,7 +671,7 @@ XCTRL_API Window select_window(Display *disp, int button)
 
 
 
-XCTRL_API char* get_desktop_name(Display *disp, int desknum, Bool force_utf8)
+XCTRL_API char* get_desktop_name(Display*disp, int desknum, Bool force_utf8)
 {
   char *name_list = NULL;
   ulong name_list_size = 0;
@@ -688,7 +688,7 @@ XCTRL_API char* get_desktop_name(Display *disp, int desknum, Bool force_utf8)
     name_list = get_prop(disp, root, XA_STRING, "_WIN_WORKSPACE_NAMES", &name_list_size);
   }
   if (name_list) {
-    if (desknum>0) { 
+    if (desknum>0) {
       int id=1;
       char*p=name_list;
       do {
@@ -708,7 +708,7 @@ XCTRL_API char* get_desktop_name(Display *disp, int desknum, Bool force_utf8)
 
 
 
-XCTRL_API int get_workarea_geom(Display *disp, Geometry*geom, int desknum)
+XCTRL_API int get_workarea_geom(Display*disp, Geometry*geom, int desknum)
 {
   ulong *wkarea = NULL;
   ulong wkarea_size = 0;
@@ -723,7 +723,7 @@ XCTRL_API int get_workarea_geom(Display *disp, Geometry*geom, int desknum)
     if (wkarea_size == (4*sizeof(*wkarea))) {
       geom->x=wkarea[0];
       geom->y=wkarea[1];
-      geom->w=wkarea[2];          
+      geom->w=wkarea[2];
       geom->h=wkarea[3];
       rv=1;
     } else {
@@ -742,7 +742,7 @@ XCTRL_API int get_workarea_geom(Display *disp, Geometry*geom, int desknum)
 
 
 
-XCTRL_API int get_desktop_geom(Display *disp, int desknum, Geometry*geom)
+XCTRL_API int get_desktop_geom(Display*disp, int desknum, Geometry*geom)
 {
   ulong *desk_geom   =  NULL;
   ulong geom_size = 0;
@@ -782,7 +782,7 @@ XCTRL_API int get_desktop_geom(Display *disp, int desknum, Geometry*geom)
 
 
 
-XCTRL_API long get_desktop_of_window(Display *disp, Window win)
+XCTRL_API long get_desktop_of_window(Display*disp, Window win)
 {
   ulong *p = get_uprop(win, "_NET_WM_DESKTOP", NULL);
   if (!p) {
@@ -793,7 +793,7 @@ XCTRL_API long get_desktop_of_window(Display *disp, Window win)
 
 
 
-XCTRL_API ulong get_win_pid(Display *disp, Window win)
+XCTRL_API ulong get_win_pid(Display*disp, Window win)
 {
   ulong *p=get_uprop(win, "_NET_WM_PID", NULL);
   return ptr_to_ulong(p,0);
@@ -812,8 +812,8 @@ XCTRL_API char*get_client_machine(Display *disp, Window win)
   Adapted from the (public domain) example by by Adam Pierce --
     http://www.doctort.org/adam/nerd-notes/x11-fake-keypress-event.html
 */
-XCTRL_API void send_keystrokes(Display *disp, Window win, const char*keys)
-{ 
+XCTRL_API void send_keystrokes(Display*disp, Window win, const char*keys)
+{
   Bool escaped=0;
   const char* numkeys_upper="~!@#$%^&*()_+|";
   const char* numkeys_lower="`1234567890-=\\";
@@ -848,7 +848,7 @@ XCTRL_API void send_keystrokes(Display *disp, Window win, const char*keys)
         if (!escaped) {
           escaped=True;
           continue;
-        } else { 
+        } else {
           c=*p;
           break;
         }
@@ -872,7 +872,7 @@ XCTRL_API void send_keystrokes(Display *disp, Window win, const char*keys)
         int f;
         if (escaped && p[1] && strchr("01", p[1]) && (p[2]>='0') && (p[2]<='9')) {
           char num[3]={0,0,0};
-          if (p[1]=='1') { 
+          if (p[1]=='1') {
             strncpy(num,(char*)p+1,2);
           } else {
             num[0]=p[2];
@@ -937,7 +937,7 @@ XCTRL_API void send_keystrokes(Display *disp, Window win, const char*keys)
  * A window
  * An event to process
  * The selection to return
- * The target(UTF8_STRING or XA_STRING) to return 
+ * The target(UTF8_STRING or XA_STRING) to return
  * A pointer to a char array to put the selection into.
  * A pointer to a long to record the length of the char array
  * A pointer to an int to record the context in which to process the event
@@ -980,7 +980,7 @@ static int xcout(Display*dpy, Window win, XEvent evt, Atom sel, Atom trg, uchar*
         }
 
         /* find the size and format of the data in property */
-        XGetWindowProperty( dpy, win, prop, 0, 0, False, AnyPropertyType, 
+        XGetWindowProperty( dpy, win, prop, 0, 0, False, AnyPropertyType,
                               &prop_type, &prop_fmt, &prop_items, &prop_size, &buffer );
         XFree(buffer);
 
@@ -1021,7 +1021,7 @@ static int xcout(Display*dpy, Window win, XEvent evt, Atom sel, Atom trg, uchar*
         return (1);
       }
       case XCLIB_XCOUT_INCR: {
-        /* To use the INCR method, we delete the property with the selection in it, 
+        /* To use the INCR method, we delete the property with the selection in it,
            wait for an event indicating that the property has been created,
            then read it, delete it, etc. */
 
@@ -1086,7 +1086,7 @@ static int xcout(Display*dpy, Window win, XEvent evt, Atom sel, Atom trg, uchar*
  *   In case of an INCR transfer, the position within the array of chars that's being processed.
  *   The context that event is the be processed within.
  */
-static int xcin( Display*dpy, Window*win, XEvent evt, Atom*prop, 
+static int xcin( Display*dpy, Window*win, XEvent evt, Atom*prop,
                    Atom trg, uchar*txt, ulong len, ulong*pos, uint *ctx )
 {
   ulong chunk_len;  /* length of current chunk (for incr transfers only) */
@@ -1124,7 +1124,7 @@ static int xcin( Display*dpy, Window*win, XEvent evt, Atom*prop,
       }
 
       /* FIXME? According to ICCCM section 2.5, we should confirm that X ChangeProperty
-         succeeded without any Alloc errors before replying with SelectionNotify. 
+         succeeded without any Alloc errors before replying with SelectionNotify.
          However, doing so would require an error handler which modifies a global
          variable, plus doing XSync after each X ChangeProperty. */
       resp.xselection.property = *prop;
@@ -1139,7 +1139,7 @@ static int xcin( Display*dpy, Window*win, XEvent evt, Atom*prop,
       return (len > chunk_size) ? 0 : 1; /* if data sent all at once, transfer is complete. */
       break;
     }
-    case XCLIB_XCIN_INCR: { 
+    case XCLIB_XCIN_INCR: {
       if (evt.type != PropertyNotify) { return (0); } /* ignore non-property events */
       if (evt.xproperty.state != PropertyDelete) { return (0); }   /* only interest in deleted props */
       chunk_len = chunk_size; /* set length to max size */
@@ -1186,7 +1186,7 @@ static Window make_selection_window(Display*dpy)
 
 
 
-XCTRL_API void set_selection(Display*dpy, char kind, char *sel_buf, Bool utf8)
+XCTRL_API void set_selection(Display*dpy, char kind, char*sel_buf, Bool utf8)
 {
   Atom seltype=selarg_to_seltype(dpy,kind);
   long sel_len=strlen(sel_buf);
@@ -1216,7 +1216,7 @@ XCTRL_API void set_selection(Display*dpy, char kind, char *sel_buf, Bool utf8)
 }
 
 
-XCTRL_API uchar* get_selection(Display* dpy, char kind, Bool utf8)
+XCTRL_API uchar* get_selection(Display*dpy, char kind, Bool utf8)
 {
   uchar *sel_buf=NULL;  /* buffer for selection data */
   ulong sel_len = 0;  /* length of sel_buf */

@@ -63,59 +63,59 @@ typedef struct _Geometry {
 
 /* Charset functions */
 XCTRL_API void init_charset(Bool force_utf8, char*charset);
-XCTRL_API char *convert_locale(const char*src, const char*from, const char*to);
+XCTRL_API char* convert_locale(const char*src, const char*from, const char*to);
 XCTRL_API char* locale_to_utf8(const char*src);
 XCTRL_API char* utf8_to_locale(const char*src);
 
 /* Window selection functions */
-XCTRL_API Window *get_window_list(Display *disp, ulong*size);
-XCTRL_API Window select_window(Display *disp, int button); /* -1 = any button */
-XCTRL_API Window get_active_window(Display *disp);
+XCTRL_API Window* get_window_list(Display*disp, ulong*size);
+XCTRL_API Window select_window(Display*disp, int button); /* -1 = any button */
+XCTRL_API Window get_active_window(Display*disp);
 
 /* Window information and manipulation functions */
-XCTRL_API Bool activate_window(Display *disp, Window win, Bool switch_desk);
-XCTRL_API int set_window_state(Display *disp, Window win, ulong action, const char*p1, const char*p2);
-XCTRL_API Bool iconify_window(Display *disp, Window win);
-XCTRL_API int close_window(Display *disp, Window win);
+XCTRL_API Bool activate_window(Display*disp, Window win, Bool switch_desk);
+XCTRL_API int set_window_state(Display*disp, Window win, ulong action, const char*p1, const char*p2);
+XCTRL_API Bool iconify_window(Display*disp, Window win);
+XCTRL_API int close_window(Display*disp, Window win);
 
-XCTRL_API char* get_window_class(Display *disp, Window win);
-XCTRL_API char* get_window_title(Display *disp, Window win);
-XCTRL_API void set_window_title(Display *disp, Window win, const char *title, char mode);
+XCTRL_API char* get_window_class(Display*disp, Window win);
+XCTRL_API char* get_window_title(Display*disp, Window win);
+XCTRL_API void set_window_title(Display*disp, Window win, const char*title, char mode);
 
-XCTRL_API int set_window_geom(Display *disp, Window win, long grav, long x, long y, long w, long h);
-XCTRL_API void get_window_geom(Display *disp,  Window win, Geometry*geom);
+XCTRL_API int set_window_geom(Display*disp, Window win, long grav, long x, long y, long w, long h);
+XCTRL_API void get_window_geom(Display*disp,  Window win, Geometry*geom);
 
-XCTRL_API int send_window_to_desktop(Display *disp, Window win, int desktop);
-XCTRL_API long get_desktop_of_window(Display *disp, Window win);
+XCTRL_API int send_window_to_desktop(Display*disp, Window win, int desktop);
+XCTRL_API long get_desktop_of_window(Display*disp, Window win);
 
-XCTRL_API ulong get_win_pid(Display *disp, Window win);
-XCTRL_API char*get_client_machine(Display *disp, Window win);
-XCTRL_API void send_keystrokes(Display *disp, Window win, const char*keys);
+XCTRL_API ulong get_win_pid(Display*disp, Window win);
+XCTRL_API char* get_client_machine(Display*disp, Window win);
+XCTRL_API void send_keystrokes(Display*disp, Window win, const char*keys);
 
 /* Desktop information and manipulation functions */
-XCTRL_API int get_showing_desktop(Display *disp);
-XCTRL_API int set_showing_desktop(Display *disp, ulong state);
+XCTRL_API int get_showing_desktop(Display*disp);
+XCTRL_API int set_showing_desktop(Display*disp, ulong state);
 
-XCTRL_API char* get_desktop_name(Display *disp, int desknum, Bool force_utf8);
-XCTRL_API int get_workarea_geom(Display *disp, Geometry*geom, int desknum);
+XCTRL_API char* get_desktop_name(Display*disp, int desknum, Bool force_utf8);
+XCTRL_API int get_workarea_geom(Display*disp, Geometry*geom, int desknum);
 
-XCTRL_API int get_desktop_geom(Display *disp, int desknum, Geometry*geom);
-XCTRL_API int change_geometry(Display *disp, ulong x, ulong y);
-XCTRL_API int change_viewport(Display *disp, ulong x, ulong y);
+XCTRL_API int get_desktop_geom(Display*disp, int desknum, Geometry*geom);
+XCTRL_API int change_geometry(Display*disp, ulong x, ulong y);
+XCTRL_API int change_viewport(Display*disp, ulong x, ulong y);
 
-XCTRL_API long get_number_of_desktops(Display *disp);
-XCTRL_API int set_number_of_desktops(Display *disp, ulong n);
+XCTRL_API long get_number_of_desktops(Display*disp);
+XCTRL_API int set_number_of_desktops(Display*disp, ulong n);
 
-XCTRL_API long get_current_desktop(Display *disp);
-XCTRL_API int set_current_desktop(Display *disp, ulong target);
+XCTRL_API long get_current_desktop(Display*disp);
+XCTRL_API int set_current_desktop(Display*disp, ulong target);
 
 
 /* Window manager information functions */
-XCTRL_API Window supporting_wm_check(Display *disp);
-XCTRL_API char* get_wm_name(Display *disp);
-XCTRL_API char* get_wm_class(Display *disp);
-XCTRL_API ulong get_wm_pid(Display *disp);
+XCTRL_API Window supporting_wm_check(Display*disp);
+XCTRL_API char* get_wm_name(Display*disp);
+XCTRL_API char* get_wm_class(Display*disp);
+XCTRL_API ulong get_wm_pid(Display*disp);
 
-XCTRL_API void set_selection(Display*dpy, char kind, char *sel_buf, Bool utf8);
+XCTRL_API void set_selection(Display*dpy, char kind, char*sel_buf, Bool utf8);
 XCTRL_API uchar* get_selection(Display* dpy, char kind, Bool utf8);
 

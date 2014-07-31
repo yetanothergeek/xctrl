@@ -47,7 +47,7 @@ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 static char lwmc_error_buffer[ERR_BUF_SIZE];
 
-static int lwmc_handle_error(Display *dpy, XErrorEvent*ev)
+static int lwmc_handle_error(Display*dpy, XErrorEvent*ev)
 {
   memset(lwmc_error_buffer, '\0', ERR_BUF_SIZE);
   if ( !ev ) {
@@ -78,7 +78,7 @@ static XCtrl*lwmc_check_obj(lua_State*L) {
 
 
 
-static int lwmc_failure(lua_State *L, const char*msg)
+static int lwmc_failure(lua_State*L, const char*msg)
 {
   lua_pushnil(L);
   lua_pushstring(L,msg);
@@ -87,9 +87,9 @@ static int lwmc_failure(lua_State *L, const char*msg)
 
 
 
-static int lwmc_new(lua_State *L)
+static int lwmc_new(lua_State*L)
 {
-  if (wm==NULL) { 
+  if (wm==NULL) {
     const char*req_dpyname=luaL_optstring(L,1,NULL);
     char*act_dpyname=XDisplayName(req_dpyname);
     Display*dpy=XOpenDisplay(req_dpyname);
@@ -118,8 +118,8 @@ static int lwmc_new(lua_State *L)
 
 
 
-static int lwmc_gc(lua_State *L)
-{  
+static int lwmc_gc(lua_State*L)
+{
   XCtrl*ud=lwmc_check_obj(L);
   XSetErrorHandler(wm->old_err_handler);
   XCloseDisplay(ud->dpy);
@@ -131,7 +131,7 @@ static int lwmc_gc(lua_State *L)
 
 
 
-static int lwmc_get_wm_win(lua_State *L)
+static int lwmc_get_wm_win(lua_State*L)
 {
   XCtrl*ud=lwmc_check_obj(L);
   lua_pushnumber(L,supporting_wm_check(ud->dpy));
@@ -140,7 +140,7 @@ static int lwmc_get_wm_win(lua_State *L)
 
 
 
-static int lwmc_get_wm_name(lua_State *L)
+static int lwmc_get_wm_name(lua_State*L)
 {
   XCtrl*ud=lwmc_check_obj(L);
   char*tmp=get_wm_name(ud->dpy);
@@ -151,7 +151,7 @@ static int lwmc_get_wm_name(lua_State *L)
 
 
 
-static int lwmc_get_wm_class(lua_State *L)
+static int lwmc_get_wm_class(lua_State*L)
 {
   XCtrl*ud=lwmc_check_obj(L);
   char*tmp=get_wm_class(ud->dpy);
@@ -162,7 +162,7 @@ static int lwmc_get_wm_class(lua_State *L)
 
 
 
-static int lwmc_get_wm_pid(lua_State *L)
+static int lwmc_get_wm_pid(lua_State*L)
 {
   XCtrl*ud=lwmc_check_obj(L);
   lua_pushnumber(L,get_wm_pid(ud->dpy));
@@ -172,7 +172,7 @@ static int lwmc_get_wm_pid(lua_State *L)
 
 
 
-static int lwmc_get_showing_desktop(lua_State *L)
+static int lwmc_get_showing_desktop(lua_State*L)
 {
   XCtrl*ud=lwmc_check_obj(L);
   lua_pushnumber(L,get_showing_desktop(ud->dpy));
@@ -181,7 +181,7 @@ static int lwmc_get_showing_desktop(lua_State *L)
 
 
 
-static int lwmc_get_display(lua_State *L)
+static int lwmc_get_display(lua_State*L)
 {
   XCtrl*ud=lwmc_check_obj(L);
   lua_pushstring(L,ud->dpyname);
@@ -190,7 +190,7 @@ static int lwmc_get_display(lua_State *L)
 
 
 
-static Window check_window(lua_State *L, XCtrl*ud, int argnum)
+static Window check_window(lua_State*L, XCtrl*ud, int argnum)
 {
   Window win;
   memset(lwmc_error_buffer, '\0', ERR_BUF_SIZE);
@@ -201,10 +201,10 @@ static Window check_window(lua_State *L, XCtrl*ud, int argnum)
 
 
 
-static Bool lwmc_success(lua_State *L, XCtrl*ud)
+static Bool lwmc_success(lua_State*L, XCtrl*ud)
 {
   XSync(ud->dpy,False);
-  if (lwmc_error_buffer[0]!=0) { 
+  if (lwmc_error_buffer[0]!=0) {
     lua_pushnil(L); \
     lua_pushstring(L,lwmc_error_buffer);
     return False;
@@ -214,7 +214,7 @@ static Bool lwmc_success(lua_State *L, XCtrl*ud)
 
 
 
-static int lwmc_get_win_class(lua_State *L)
+static int lwmc_get_win_class(lua_State*L)
 {
   XCtrl*ud=lwmc_check_obj(L);
   Window win=check_window(L,ud,2);
@@ -231,7 +231,7 @@ static int lwmc_get_win_class(lua_State *L)
 
 
 
-static int lwmc_get_win_title(lua_State *L)
+static int lwmc_get_win_title(lua_State*L)
 {
   XCtrl*ud=lwmc_check_obj(L);
   Window win=check_window(L,ud,2);
@@ -248,8 +248,8 @@ static int lwmc_get_win_title(lua_State *L)
 
 
 
-static int lwmc_set_win_title(lua_State *L)
-{ 
+static int lwmc_set_win_title(lua_State*L)
+{
   XCtrl*ud=lwmc_check_obj(L);
   Window win=check_window(L,ud,2);
   const char*name=luaL_checkstring(L,3);
@@ -264,15 +264,15 @@ static int lwmc_set_win_title(lua_State *L)
 
 
 
-static int lwmc_set_win_geom(lua_State *L)
+static int lwmc_set_win_geom(lua_State*L)
 {
   XCtrl*ud=lwmc_check_obj(L);
   Window win=check_window(L,ud,2);
-  long x=luaL_checknumber(L,3); 
+  long x=luaL_checknumber(L,3);
   long y=luaL_checknumber(L,4);
   long w=luaL_checknumber(L,5);
   long h=luaL_checknumber(L,6);
-  long g=luaL_optnumber(L,7,0); 
+  long g=luaL_optnumber(L,7,0);
   if (set_window_geom(ud->dpy, win, g,x,y,w,h)) {
     return lwmc_failure(L,"move/resize failed");
   } else if (lwmc_success(L,ud)) {
@@ -285,7 +285,7 @@ static int lwmc_set_win_geom(lua_State *L)
 
 
 
-static int lwmc_close_win(lua_State *L)
+static int lwmc_close_win(lua_State*L)
 {
   XCtrl*ud=lwmc_check_obj(L);
   Window win=check_window(L,ud,2);
@@ -301,8 +301,8 @@ static int lwmc_close_win(lua_State *L)
 
 
 
-static int lwmc_activate_win(lua_State *L)
-{  
+static int lwmc_activate_win(lua_State*L)
+{
   XCtrl*ud=lwmc_check_obj(L);
   Window win=check_window(L,ud,2);
   int switch_desktop=True;
@@ -320,7 +320,7 @@ static int lwmc_activate_win(lua_State *L)
 
 
 
-static int lwmc_iconify_win(lua_State *L)
+static int lwmc_iconify_win(lua_State*L)
 {
   XCtrl*ud=lwmc_check_obj(L);
   Window win=check_window(L,ud,2);
@@ -339,14 +339,14 @@ static int lwmc_iconify_win(lua_State *L)
 
 
 
-static int lwmc_set_desk_of_win(lua_State *L)
+static int lwmc_set_desk_of_win(lua_State*L)
 {
   XCtrl*ud=lwmc_check_obj(L);
   Window win=check_window(L,ud,2);
   int desk=luaL_checknumber(L,3);
   int ok=send_window_to_desktop(ud->dpy,win,desk-1);
   if (lwmc_success(L,ud)) {
-    if (ok) { 
+    if (ok) {
       lua_pushboolean(L,True);
       return 1;
     } else {
@@ -357,7 +357,7 @@ static int lwmc_set_desk_of_win(lua_State *L)
 
 
 
-static int lwmc_get_desk_of_win(lua_State *L)
+static int lwmc_get_desk_of_win(lua_State*L)
 {
   XCtrl*ud=lwmc_check_obj(L);
   Window win=check_window(L,ud,2);
@@ -374,7 +374,7 @@ static int lwmc_get_desk_of_win(lua_State *L)
 
 
 
-static int lwmc_get_pid_of_win(lua_State *L)
+static int lwmc_get_pid_of_win(lua_State*L)
 {
   XCtrl*ud=lwmc_check_obj(L);
   Window win=check_window(L,ud,2);
@@ -391,7 +391,7 @@ static int lwmc_get_pid_of_win(lua_State *L)
 
 
 
-static int lwmc_get_win_client(lua_State *L)
+static int lwmc_get_win_client(lua_State*L)
 {
   XCtrl*ud=lwmc_check_obj(L);
   Window win=check_window(L,ud,2);
@@ -412,12 +412,12 @@ static int lwmc_get_win_client(lua_State *L)
 
 
 
-static int lwmc_set_win_state(lua_State *L)
+static int lwmc_set_win_state(lua_State*L)
 {
   XCtrl*ud=lwmc_check_obj(L);
   Window win=check_window(L,ud,2);
   ulong action;
-  const char *p1; 
+  const char *p1;
   const char *p2;
   const char* actions[]={"add", "remove", "toggle", NULL};
   switch (luaL_checkoption(L,3,NULL,actions)) {
@@ -440,7 +440,7 @@ static int lwmc_set_win_state(lua_State *L)
 
 
 
-static int lwmc_pick_win(lua_State *L)
+static int lwmc_pick_win(lua_State*L)
 {
   XCtrl*ud=lwmc_check_obj(L);
   int btn=-1;
@@ -455,7 +455,7 @@ static int lwmc_pick_win(lua_State *L)
 
 
 
-static int lwmc_get_active_win(lua_State *L)
+static int lwmc_get_active_win(lua_State*L)
 {
   XCtrl*ud=lwmc_check_obj(L);
   lua_pushnumber(L,get_active_window(ud->dpy));
@@ -464,8 +464,8 @@ static int lwmc_get_active_win(lua_State *L)
 
 
 
-static int lwmc_root_win(lua_State *L)
-{ 
+static int lwmc_root_win(lua_State*L)
+{
   XCtrl*ud=lwmc_check_obj(L);
   lua_pushnumber(L,DefaultRootWindow(ud->dpy));
   return 1;
@@ -473,7 +473,7 @@ static int lwmc_root_win(lua_State *L)
 
 
 
-static int lwmc_get_win_geom(lua_State *L) {
+static int lwmc_get_win_geom(lua_State*L) {
   XCtrl*ud=lwmc_check_obj(L);
   Window win=check_window(L,ud,2);
   Geometry inf={0,0,0,0};
@@ -492,7 +492,7 @@ static int lwmc_get_win_geom(lua_State *L) {
 
 
 
-static int lwmc_get_workarea(lua_State *L) {
+static int lwmc_get_workarea(lua_State*L) {
   XCtrl*ud=lwmc_check_obj(L);
   int desknum=luaL_checknumber(L,2);
   Geometry inf={0,0,0,0};
@@ -510,7 +510,7 @@ static int lwmc_get_workarea(lua_State *L) {
 
 
 
-static int lwmc_get_desk_geom(lua_State *L) {
+static int lwmc_get_desk_geom(lua_State*L) {
   XCtrl*ud=lwmc_check_obj(L);
   int desknum=luaL_checknumber(L,2);
   Geometry inf={0,0,0,0};
@@ -528,12 +528,12 @@ static int lwmc_get_desk_geom(lua_State *L) {
 
 
 
-static int lwmc_get_win_list(lua_State* L)
+static int lwmc_get_win_list(lua_State*L)
 {
   XCtrl*ud=lwmc_check_obj(L);
   unsigned long size;
   Window*list=get_window_list(ud->dpy, &size);
-  if (list) { 
+  if (list) {
     unsigned long i;
     size= size / sizeof(Window);
     lua_newtable(L);
@@ -551,7 +551,7 @@ static int lwmc_get_win_list(lua_State* L)
 
 
 
-static int lwmc_tostring(lua_State *L)
+static int lwmc_tostring(lua_State*L)
 {
   lua_pushfstring(L,"%s (%p)", XCTRL_META_NAME, wm);
   return 1;
@@ -566,8 +566,8 @@ typedef struct _DtCbData {
 
 
 
-static int lwmc_get_desk_name(lua_State *L)
-{ 
+static int lwmc_get_desk_name(lua_State*L)
+{
   XCtrl*ud=lwmc_check_obj(L);
   int desknum=luaL_checknumber(L,2);
   int force_utf8 = (lua_gettop(L)>2) ? lua_toboolean(L,3) : 0;
@@ -579,17 +579,17 @@ static int lwmc_get_desk_name(lua_State *L)
 
 
 
-static int lwmc_set_showing_desktop(lua_State *L)
+static int lwmc_set_showing_desktop(lua_State*L)
 {
   XCtrl*ud=lwmc_check_obj(L);
-  luaL_argcheck(L, lua_gettop(L)>1, 2, "expected boolean"); 
+  luaL_argcheck(L, lua_gettop(L)>1, 2, "expected boolean");
   set_showing_desktop(ud->dpy, lua_toboolean(L,2));
   return 0;
 }
 
 
 
-static int lwmc_set_num_desks(lua_State *L)
+static int lwmc_set_num_desks(lua_State*L)
 {
   XCtrl*ud=lwmc_check_obj(L);
   int n=luaL_checknumber(L,2);
@@ -603,8 +603,8 @@ static int lwmc_set_num_desks(lua_State *L)
 
 
 
-static int lwmc_set_curr_desk(lua_State *L)
-{ 
+static int lwmc_set_curr_desk(lua_State*L)
+{
   XCtrl*ud=lwmc_check_obj(L);
   int n=luaL_checknumber(L,2);
   lua_pushboolean(L,set_current_desktop(ud->dpy,n-1));
@@ -613,7 +613,7 @@ static int lwmc_set_curr_desk(lua_State *L)
 
 
 
-static int lwmc_set_desk_vport(lua_State *L)
+static int lwmc_set_desk_vport(lua_State*L)
 {
   XCtrl*ud=lwmc_check_obj(L);
   int x=luaL_checknumber(L,2);
@@ -624,7 +624,7 @@ static int lwmc_set_desk_vport(lua_State *L)
 
 
 
-static int lwmc_set_desk_geom(lua_State *L)
+static int lwmc_set_desk_geom(lua_State*L)
 {
   XCtrl*ud=lwmc_check_obj(L);
   int x=luaL_checknumber(L,2);
@@ -635,7 +635,7 @@ static int lwmc_set_desk_geom(lua_State *L)
 
 
 
-static int lwmc_get_num_desks(lua_State *L)
+static int lwmc_get_num_desks(lua_State*L)
 {
   XCtrl*ud=lwmc_check_obj(L);
   lua_pushnumber(L,get_number_of_desktops(ud->dpy));
@@ -644,7 +644,7 @@ static int lwmc_get_num_desks(lua_State *L)
 
 
 
-static int lwmc_get_curr_desk(lua_State *L)
+static int lwmc_get_curr_desk(lua_State*L)
 {
   XCtrl*ud=lwmc_check_obj(L);
   lua_pushnumber(L,get_current_desktop(ud->dpy)+1);
@@ -653,7 +653,7 @@ static int lwmc_get_curr_desk(lua_State *L)
 
 
 
-static int lwmc_send_keys(lua_State *L)
+static int lwmc_send_keys(lua_State*L)
 {
   XCtrl*ud=lwmc_check_obj(L);
   Window win=check_window(L,ud,2);
@@ -664,7 +664,7 @@ static int lwmc_send_keys(lua_State *L)
 
 
 
-static int lwmc_convert_locale(lua_State *L)
+static int lwmc_convert_locale(lua_State*L)
 {
   const char*src,*from_charset,*to_charset;
   char*dst;
@@ -684,7 +684,7 @@ static int lwmc_convert_locale(lua_State *L)
 
 
 
-static int lwmc_do_events(lua_State *L)
+static int lwmc_do_events(lua_State*L)
 {
   XCtrl*ud=lwmc_check_obj(L);
   int n=luaL_optnumber(L,2,1);
@@ -697,7 +697,7 @@ static int lwmc_do_events(lua_State *L)
 }
 
 
-static int lwmc_get_selection(lua_State *L)
+static int lwmc_get_selection(lua_State*L)
 {
   XCtrl*ud=lwmc_check_obj(L);
   const char*kind=luaL_optstring(L,2,"p");
@@ -713,8 +713,8 @@ static int lwmc_get_selection(lua_State *L)
 
 
 
-static int lwmc_set_selection(lua_State *L)
-{ 
+static int lwmc_set_selection(lua_State*L)
+{
   XCtrl*ud=lwmc_check_obj(L);
   const char*sel=luaL_checkstring(L,2);
   const char*kind=luaL_optstring(L,3,"p");
@@ -736,8 +736,8 @@ static const struct luaL_Reg lwmc_funcs[] = {
   {"set_win_state",   lwmc_set_win_state},
   {"set_win_geom",    lwmc_set_win_geom},
   {"get_win_geom",    lwmc_get_win_geom},
-  {"get_active_win",  lwmc_get_active_win}, 
-  {"pick_win",        lwmc_pick_win},  
+  {"get_active_win",  lwmc_get_active_win},
+  {"pick_win",        lwmc_pick_win},
   {"root_win",        lwmc_root_win},
   {"set_desk_of_win", lwmc_set_desk_of_win},
   {"get_desk_of_win", lwmc_get_desk_of_win},
@@ -769,9 +769,9 @@ static const struct luaL_Reg lwmc_funcs[] = {
 };
 
 
-int luaopen_xctrl(lua_State *L);
+int luaopen_xctrl(lua_State*L);
 
-int luaopen_xctrl(lua_State *L)
+int luaopen_xctrl(lua_State*L)
 {
   luaL_newmetatable(L, XCTRL_META_NAME);
   lua_pushstring(L, "__index");
