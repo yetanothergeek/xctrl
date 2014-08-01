@@ -575,6 +575,31 @@ XCTRL_API char*get_window_type(Display*disp, Window win)
 
 
 
+typedef struct {
+  unsigned long flags;
+  unsigned long functions;
+  unsigned long decorations;
+  long inputmode;
+  unsigned long status;
+} MotifHints;
+
+
+
+XCTRL_API void set_window_mwm_hints(Display*disp, Window win, ulong flags, ulong funcs, ulong decors, ulong imode)
+{
+  Atom atom=0;
+  MotifHints hints;
+  hints.flags=flags;
+  hints.functions=funcs;
+  hints.decorations=decors;
+  hints.inputmode=imode;
+  hints.status=0;
+  if (!atom) { atom=XInternAtom(disp, "_MOTIF_WM_HINTS", False); }
+  XChangeProperty(disp,win,atom,atom,32,PropModeReplace,(unsigned char*)&hints,4);
+}
+
+
+
 XCTRL_API void get_window_geom(Display*disp, Window win, Geometry*geom)
 {
   int x, y;

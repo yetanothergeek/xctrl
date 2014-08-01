@@ -594,6 +594,94 @@ static int lwmc_get_win_type(lua_State*L)
 }
 
 
+static int lookup_mwm_hint(const char*a)
+{
+  static const char* hints[] = {
+    "none",     /* 0 */
+    "all",      /* 1 */
+    "border",   /* 2 */
+    "resize",   /* 3 */
+    "title",    /* 4 */
+    "maximize", /* 5 */
+    "close",    /* 6 */
+     NULL
+  };
+  int i;
+  for (i=0; hints[i]; i++) {
+    if (strcmp(a,hints[i])==0) { return i; }
+  }
+  return -1;
+}
+
+
+#if LUA_VERSION_NUM>501
+#define TableLength lua_rawlen
+#else
+#define TableLength lua_objlen
+#endif
+
+static int lwmc_set_win_decor(lua_State*L)
+{
+  XCtrl*ud=lwmc_check_obj(L);
+  Window win=check_window(L,ud,2);
+  int i,n;
+  long flags=XCTRL_MWM_HINTS_FUNCTIONS|XCTRL_MWM_HINTS_DECORATIONS;
+  long funcs=0;
+  long decors=0;
+  long imode=0;
+  luaL_argcheck(L, lua_istable(L,3), 3, "expected table");
+  n=TableLength(L, 3);
+  luaL_argcheck(L,n>0,3,"table must not be empty");
+  for (i=1; i<=n; i++) {
+    lua_rawgeti(L, 3, i);
+    if (lua_isstring(L,-1)) {
+      switch (lookup_mwm_hint(lua_tostring(L, -1))) {
+        case -1: { /* invalid */
+          return luaL_argerror(L,3,"unknown hint string in table");
+        }
+        case 0: {  /* none */
+          if (n>1) { return luaL_argerror(L,3,"hint string \"none\" must be used alone"); }
+          decors=XCTRL_MWM_DECOR_NONE;
+          funcs=XCTRL_MWM_FUNC_NONE;
+          break;
+        }
+        case 1: {  /* all */
+          if (n>1) { return luaL_argerror(L,3,"hint string \"all\" must be used alone"); }
+          decors=XCTRL_MWM_DECOR_ALL;
+          funcs=XCTRL_MWM_FUNC_ALL;
+          break;
+        }
+        case 2: {  /* border */
+          decors|=XCTRL_MWM_DECOR_BORDER;
+          break;
+        }
+        case 3: {  /* resize */
+          decors|=XCTRL_MWM_DECOR_BORDER|XCTRL_MWM_DECOR_RESIZEH;
+          funcs|=XCTRL_MWM_FUNC_RESIZE;
+          break;
+        }
+        case 4: {  /* title */
+          decors|=XCTRL_MWM_DECOR_TITLE|XCTRL_MWM_DECOR_MENU;
+          funcs|=XCTRL_MWM_FUNC_MOVE;
+        }
+        case 5: { /* maximize */
+          decors|=XCTRL_MWM_DECOR_MINIMIZE|XCTRL_MWM_DECOR_MAXIMIZE;
+          funcs|=XCTRL_MWM_FUNC_MINIMIZE|XCTRL_MWM_FUNC_MAXIMIZE;
+        }
+        case 6: { /* close */
+          funcs|=XCTRL_MWM_FUNC_CLOSE;
+        }
+     }
+    } else {
+      return luaL_argerror(L,3,"table must be a list of strings");
+    }
+    lua_pop(L,1);
+  }
+  set_window_mwm_hints(ud->dpy, win, flags, funcs, decors, imode);
+  lua_pushboolean(L,1);
+  return 1;
+}
+
 
 
 static int lwmc_get_workarea(lua_State*L) {
@@ -842,6 +930,7 @@ static const struct luaL_Reg lwmc_funcs[] = {
   {"get_win_geom",    lwmc_get_win_geom},
   {"get_win_frame",   lwmc_get_win_frame},
   {"get_win_type",    lwmc_get_win_type},
+  {"set_win_decor",   lwmc_set_win_decor},
   {"get_active_win",  lwmc_get_active_win},
   {"pick_win",        lwmc_pick_win},
   {"root_win",        lwmc_root_win},
@@ -879,7 +968,6 @@ int luaopen_xctrl(lua_State*L);
 
 int luaopen_xctrl(lua_State*L)
 {
-fprintf(stderr,"TESTING!!!\n");
   luaL_newmetatable(L, XCTRL_META_NAME);
   lua_pushstring(L, "__index");
   lua_pushvalue(L, -2);

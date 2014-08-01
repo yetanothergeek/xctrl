@@ -55,6 +55,35 @@ typedef unsigned int uint;
 #define XCTRL_GEOM_USE_H (1 << 11)
 
 
+/* Definitions for Motif-style WM Hints. (Courtesy of FOX-toolkit FXWindow.cpp) */
+#define XCTRL_MWM_HINTS_FUNCTIONS    (1L << 0)       /* Definitions for MotifHints.flags */
+#define XCTRL_MWM_HINTS_DECORATIONS  (1L << 1)
+#define XCTRL_MWM_HINTS_INPUT_MODE   (1L << 2)
+#define XCTRL_MWM_HINTS_ALL          (MWM_HINTS_FUNCTIONS|MWM_HINTS_DECORATIONS|MWM_HINTS_INPUT_MODE)
+
+#define XCTRL_MWM_DECOR_NONE (0)
+#define XCTRL_MWM_DECOR_ALL       (1L << 0)       /* Definitions for MotifHints.decorations */
+#define XCTRL_MWM_DECOR_BORDER    (1L << 1)
+#define XCTRL_MWM_DECOR_RESIZEH   (1L << 2)
+#define XCTRL_MWM_DECOR_TITLE     (1L << 3)
+#define XCTRL_MWM_DECOR_MENU      (1L << 4)
+#define XCTRL_MWM_DECOR_MINIMIZE  (1L << 5)
+#define XCTRL_MWM_DECOR_MAXIMIZE  (1L << 6)
+
+#define XCTRL_MWM_FUNC_NONE (0)
+#define XCTRL_MWM_FUNC_ALL       (1L << 0)       /* Definitions for MotifHints.functions */
+#define XCTRL_MWM_FUNC_RESIZE    (1L << 1)
+#define XCTRL_MWM_FUNC_MOVE      (1L << 2)
+#define XCTRL_MWM_FUNC_MINIMIZE  (1L << 3)
+#define XCTRL_MWM_FUNC_MAXIMIZE  (1L << 4)
+#define XCTRL_MWM_FUNC_CLOSE     (1L << 5)
+
+#define XCTRL_MWM_INPUT_MODELESS                  0   /* Values for MotifHints.inputmode */
+#define XCTRL_MWM_INPUT_PRIMARY_APPLICATION_MODAL 1
+#define XCTRL_MWM_INPUT_SYSTEM_MODAL              2
+#define XCTRL_MWM_INPUT_FULL_APPLICATION_MODAL    3
+
+
 typedef struct _Geometry {
   int x;
   int y;
@@ -92,6 +121,7 @@ XCTRL_API int set_window_geom(Display*disp, Window win, long grav, long flags, l
 XCTRL_API void get_window_geom(Display*disp,  Window win, Geometry*geom);
 XCTRL_API Bool get_window_frame(Display*disp, Window win, long*left, long*right, long*top, long*bottom);
 XCTRL_API char*get_window_type(Display*disp, Window win);
+XCTRL_API void set_window_mwm_hints(Display*disp, Window win, ulong flags, ulong funcs, ulong decors, ulong imode);
 
 XCTRL_API int send_window_to_desktop(Display*disp, Window win, int desktop);
 XCTRL_API long get_desktop_of_window(Display*disp, Window win);
