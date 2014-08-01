@@ -170,7 +170,6 @@ static Bool is_envar_utf8(const char*envar)
 
 
 
-
 XCTRL_API void init_charset(Bool force_utf8, char*charset)
 {
   envir_utf8 = force_utf8?True:is_envar_utf8("LANG") || is_envar_utf8("LC_CTYPE");
@@ -351,7 +350,7 @@ XCTRL_API int change_viewport(Display*disp, ulong x, ulong y) {
 
 
 
-XCTRL_API int change_geometry (Display*disp, ulong x, ulong y) {
+XCTRL_API int change_geometry(Display*disp, ulong x, ulong y) {
   return client_msg(disp, DefRootWin, "_NET_DESKTOP_GEOMETRY", x, y, 0, 0, 0);
 }
 
@@ -503,7 +502,7 @@ XCTRL_API int set_window_state(Display*disp, Window win, ulong action, const cha
 
 
 
-XCTRL_API Bool wm_supports (Display*disp, const char*prop) {
+XCTRL_API Bool wm_supports(Display*disp, const char*prop) {
   Atom xa_prop = XInternAtom(disp, prop, False);
   ulong size;
   int i;
@@ -528,7 +527,7 @@ XCTRL_API void get_window_geom(Display*disp, Window win, Geometry*geom)
   Window root;
   memset(geom,0,sizeof(Geometry));
   XGetGeometry(disp, win, &root, &x, &y, &geom->w, &geom->h, &bw, &depth);
-  XTranslateCoordinates (disp, win, root, x, y, &geom->x, &geom->y, &root);
+  XTranslateCoordinates(disp, win, root, x, y, &geom->x, &geom->y, &root);
 }
 
 
@@ -598,7 +597,7 @@ XCTRL_API Window *get_window_list(Display*disp, ulong*size)
 
 
 
-XCTRL_API char *get_window_class (Display*disp, Window win)
+XCTRL_API char *get_window_class(Display*disp, Window win)
 {
   char *class_utf8;
   char *wm_class;
@@ -617,7 +616,7 @@ XCTRL_API char *get_window_class (Display*disp, Window win)
 
 
 
-XCTRL_API char *get_window_title (Display*disp, Window win)
+XCTRL_API char *get_window_title(Display*disp, Window win)
 {
   char *wm_name = get_prop(disp, win, GetUTF8Atom(), "_NET_WM_NAME", NULL);
   if (wm_name) {
@@ -1243,6 +1242,7 @@ XCTRL_API void set_selection(Display*dpy, char kind, char*sel_buf, Bool utf8)
     XDestroyWindow(dpy,win);
   }
 }
+
 
 
 XCTRL_API uchar* get_selection(Display*dpy, char kind, Bool utf8)

@@ -556,6 +556,7 @@ static int lwmc_get_win_geom(lua_State*L) {
 }
 
 
+
 static int lwmc_get_win_frame(lua_State*L)
 { 
   XCtrl*ud=lwmc_check_obj(L);
@@ -565,16 +566,16 @@ static int lwmc_get_win_frame(lua_State*L)
     return lwmc_failure(L,"Unsupported window manager feature");
   }
   if (get_window_frame(ud->dpy, win, &left, &right, &top, &bottom)) {
-  if (lwmc_success(L,ud)) {
-    lua_newtable(L);
-    SetTableNum("l", left);
-    SetTableNum("r", right);
-    SetTableNum("t", top);
-    SetTableNum("b", bottom);
-    return 1;
-  } else {
-    return 2;    
-  }
+    if (lwmc_success(L,ud)) {
+      lua_newtable(L);
+      SetTableNum("l", left);
+      SetTableNum("r", right);
+      SetTableNum("t", top);
+      SetTableNum("b", bottom);
+      return 1;
+    } else {
+      return 2;    
+    }
   } else {
     return lwmc_failure(L,"Could not determine frame extents");
   }
