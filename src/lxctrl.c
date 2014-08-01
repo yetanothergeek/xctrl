@@ -583,6 +583,19 @@ static int lwmc_get_win_frame(lua_State*L)
 
 
 
+static int lwmc_get_win_type(lua_State*L)
+{
+  XCtrl*ud=lwmc_check_obj(L);
+  Window win=check_window(L,ud,2);
+  char*type=get_window_type(ud->dpy, win);
+  lua_pushstring(L,type);
+  free(type);
+  return 1;
+}
+
+
+
+
 static int lwmc_get_workarea(lua_State*L) {
   XCtrl*ud=lwmc_check_obj(L);
   int desknum=luaL_checknumber(L,2);
@@ -828,6 +841,7 @@ static const struct luaL_Reg lwmc_funcs[] = {
   {"set_win_geom",    lwmc_set_win_geom},
   {"get_win_geom",    lwmc_get_win_geom},
   {"get_win_frame",   lwmc_get_win_frame},
+  {"get_win_type",    lwmc_get_win_type},
   {"get_active_win",  lwmc_get_active_win},
   {"pick_win",        lwmc_pick_win},
   {"root_win",        lwmc_root_win},

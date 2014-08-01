@@ -91,6 +91,7 @@ XCTRL_API void set_window_title(Display*disp, Window win, const char*title, char
 XCTRL_API int set_window_geom(Display*disp, Window win, long grav, long flags, long x, long y, long w, long h);
 XCTRL_API void get_window_geom(Display*disp,  Window win, Geometry*geom);
 XCTRL_API Bool get_window_frame(Display*disp, Window win, long*left, long*right, long*top, long*bottom);
+XCTRL_API char*get_window_type(Display*disp, Window win);
 
 XCTRL_API int send_window_to_desktop(Display*disp, Window win, int desktop);
 XCTRL_API long get_desktop_of_window(Display*disp, Window win);

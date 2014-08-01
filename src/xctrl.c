@@ -519,6 +519,61 @@ XCTRL_API Bool wm_supports(Display*disp, const char*prop) {
 }
 
 
+XCTRL_API char*get_window_type(Display*disp, Window win)
+{
+  static const char*shortnames[]={
+    "desktop",
+    "dock",
+    "toolbar",
+    "menu",
+    "utility",
+    "splash",
+    "dialog",
+    "normal"
+  };
+  const char*type="unsupported";
+  if (wm_supports(disp,"_NET_WM_WINDOW_TYPE")) {
+    ulong size=0;
+    Atom*atom=NULL;
+    static Atom wintypes[8]={0,0,0,0,0,0,0,0};
+    if (wintypes[0]==0) {
+      static char*netnames[]={
+      "_NET_WM_WINDOW_TYPE_DESKTOP",
+      "_NET_WM_WINDOW_TYPE_DOCK",
+      "_NET_WM_WINDOW_TYPE_TOOLBAR",
+      "_NET_WM_WINDOW_TYPE_MENU",
+      "_NET_WM_WINDOW_TYPE_UTILITY",
+      "_NET_WM_WINDOW_TYPE_SPLASH",
+      "_NET_WM_WINDOW_TYPE_DIALOG",
+      "_NET_WM_WINDOW_TYPE_NORMAL"
+      };
+      if (!XInternAtoms(disp,netnames,8,False,wintypes)) {
+        return strdup(type);
+      }
+    }
+    type="";
+    atom=(Atom*)get_prop(disp, win,XA_ATOM,"_NET_WM_WINDOW_TYPE",&size);
+    if (atom) {
+      int i;
+      for (i=0; i<8;i++) {
+        if (*atom==wintypes[i]) {
+          type=shortnames[i];
+          break;
+        }
+      }
+      sfree(atom);
+    }
+    if (type[0]=='\0') {
+      Window tw=0;
+      if (XGetTransientForHint(disp, win, &tw)) { 
+        type="dialog";
+      } else { type="normal"; }
+    }
+  }
+  return strdup(type);
+}
+
+
 
 XCTRL_API void get_window_geom(Display*disp, Window win, Geometry*geom)
 {
