@@ -727,7 +727,6 @@ static int lwmc_get_win_list(lua_State*L)
   Window*list=get_window_list(ud->dpy, &size);
   if (list) {
     unsigned long i;
-    size= size / sizeof(Window);
     lua_newtable(L);
     for (i=0; i<size; i++) {
       lua_pushnumber(L,i+1);

@@ -672,6 +672,7 @@ XCTRL_API Window *get_window_list(Display*disp, ulong*size)
   if (!client_list) {
     client_list = (Window*)get_prop(disp, DefRootWin, XA_CARDINAL, "_WIN_CLIENT_LIST", size);
   }
+  *size=*size / sizeof(Window);
   return client_list;
 }
 
