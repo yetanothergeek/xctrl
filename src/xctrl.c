@@ -1359,3 +1359,195 @@ XCTRL_API uchar* get_selection(Display*dpy, char kind, Bool utf8)
   XDestroyWindow(dpy,win);
   return result;
 }
+
+
+/*********************************************************************/
+/* * * * * * * * * * * * *  Event Listener * * * * * * * * * * * * * */
+/*********************************************************************/
+
+
+static Window*get_net_client_list(Display*disp, ulong*nitems) {
+  Atom type=XA_WINDOW;
+  Atom a=0;
+  Display*old_disp=NULL;
+  Atom ret_type;
+  int format;
+  ulong after=0;
+  unsigned char *retp;
+  if (disp!=old_disp) { 
+    old_disp=disp;
+    a=XInternAtom(disp, "_NET_CLIENT_LIST", False);
+  }
+  if (XGetWindowProperty(disp,DefRootWin,a,0,1024,False,type,&ret_type,&format,nitems,&after,&retp) != Success) {
+    *nitems=0;
+    return NULL;
+  }
+  if (ret_type != type) {
+    XFree(retp);
+    *nitems=0;
+    return NULL;
+  }
+  return (Window*)retp;
+}
+
+
+
+typedef struct _WinListItem {
+  struct _WinListItem*next;
+  Window win;
+} WinListItem;
+
+
+
+static void winlist_add_item(WinListItem**list, Display*dpy, Window win)
+{
+  WinListItem*t=calloc(1,sizeof(WinListItem));
+  t->win=win;
+  XSelectInput(dpy,win,PropertyChangeMask|FocusChangeMask|StructureNotifyMask);
+  if (!*list) {
+    *list=t;
+    return;
+  } else {
+    WinListItem*p=*list;
+    while (p->next) { p=p->next; }
+    p->next=t;
+  }
+}
+
+
+
+static void winlist_del_item(WinListItem**list, Window win)
+{
+  WinListItem*cur;
+  WinListItem*prv=NULL;
+  for (cur=*list; cur; cur=cur->next) {
+    if (cur->win==win) {
+      if (prv) {
+        prv->next=cur->next;
+      } else {
+        *list=cur->next;
+      }
+      free(cur);
+      return;
+    }
+    prv=cur;
+  }
+}
+
+
+
+static void winlist_free_all(WinListItem*list)
+{
+  WinListItem*p=list;
+  while (p) {
+    WinListItem*n=p->next;
+    free(p);
+    p=n;
+  }
+}
+
+
+
+#define EVENT_ATOM_COUNT (sizeof(event_names)/sizeof(char*))
+
+
+XCTRL_API void event_loop(Display*disp, EventCallback cb, void*cb_data)
+{
+  XEvent ev;
+  enum {
+    EV_NET_ACTIVE_WINDOW,
+    EV_NET_CLIENT_LIST,
+    EV_NET_CURRENT_DESKTOP,
+  };
+  static char*event_names[]={
+    "_NET_ACTIVE_WINDOW",
+    "_NET_CLIENT_LIST",
+    "_NET_CURRENT_DESKTOP",
+  };
+  static Display*old_disp=NULL;
+  static Atom event_atoms[EVENT_ATOM_COUNT]={0,};
+  WinListItem*ev_winlist=NULL;
+  ulong n=0;
+  ulong i;
+  Window*clients=get_net_client_list(disp, &n);
+  for (i=0; i<n; i++) { winlist_add_item(&ev_winlist,disp,clients[i]); }
+  if (clients) { XFree(clients); }
+  
+  if (disp!=old_disp) { /* re-initialize event atoms if we are on a different display */
+    old_disp=disp;
+    XInternAtoms(disp,event_names,EVENT_ATOM_COUNT,False,&event_atoms[0]);
+  }
+  XSelectInput(disp, DefRootWin, PropertyChangeMask);
+  while (1) {
+    XNextEvent(disp, &ev);
+    int rv=1;
+    switch (ev.type) {
+      case PropertyNotify: {
+        int ev_tag=-1;
+        for (i=0; i<EVENT_ATOM_COUNT; i++) {
+          if (ev.xproperty.atom==event_atoms[i]) {
+            ev_tag=i;
+            break;
+          }
+        }
+        switch (ev_tag) {
+          case EV_NET_CLIENT_LIST: {
+            clients=get_net_client_list(disp, &n);
+            WinListItem*p1=ev_winlist;
+            WinListItem*p2=NULL;
+            while (p1) { /* Remove any deleted windows */
+              int do_del=1;
+              p2=p1->next;
+              for (i=0; i<n; i++) {
+                if (p1->win == clients[i]) {
+                  do_del=0;
+                  break;
+                }
+              }
+              if ( do_del ) {
+                Window x=p1->win;
+                winlist_del_item(&ev_winlist, p1->win);
+                rv=cb(XCTRL_EVENT_WINDOW_LIST_DELETE,x,cb_data);
+              }
+              p1=p2;
+            }
+            for (i = 0; i < n; i++) { /* Add any new windows */
+              int found=0;
+              for (p1=ev_winlist;p1;p1=p1->next) {
+                if (clients[i]==p1->win) {
+                  found=1;
+                  break;
+                }
+              }
+              if (!found) {
+                winlist_add_item(&ev_winlist,disp,clients[i]);
+                rv=cb(XCTRL_EVENT_WINDOW_LIST_INSERT,clients[i],cb_data);
+              }
+            }
+            if (clients) { XFree(clients); }
+            break;
+          }
+          case EV_NET_CURRENT_DESKTOP: {
+            rv=cb(XCTRL_EVENT_DESKTOP_SWITCH,get_current_desktop(disp),cb_data);
+          }
+        }
+        break;
+      }
+      case ConfigureNotify: {
+        rv=cb(XCTRL_EVENT_WINDOW_MOVE_RESIZE,ev.xconfigure.window,cb_data);
+        break;
+      }
+      case FocusIn: {
+        rv=cb(XCTRL_EVENT_WINDOW_FOCUS_GAINED,ev.xfocus.window,cb_data);
+        break;
+      }
+      case FocusOut: {
+        rv=cb(XCTRL_EVENT_WINDOW_FOCUS_LOST,ev.xfocus.window,cb_data);
+        break;
+      }
+    }
+    if (!rv) { break; }
+  }
+  winlist_free_all(ev_winlist);
+}
+

@@ -158,3 +158,21 @@ XCTRL_API Bool wm_supports(Display*disp, const char*prop);
 XCTRL_API void set_selection(Display*dpy, char kind, char*sel_buf, Bool utf8);
 XCTRL_API uchar* get_selection(Display* dpy, char kind, Bool utf8);
 
+
+/* Event listener event types */
+enum {
+  XCTRL_EVENT_WINDOW_LIST_INSERT,
+  XCTRL_EVENT_WINDOW_LIST_DELETE,
+  XCTRL_EVENT_WINDOW_FOCUS_GAINED,
+  XCTRL_EVENT_WINDOW_FOCUS_LOST,
+  XCTRL_EVENT_WINDOW_MOVE_RESIZE,
+  XCTRL_EVENT_DESKTOP_SWITCH,
+};
+
+/* Event listener callback type */
+typedef int (*EventCallback) (int ev, Window win, void*cb_data);
+
+/* Event listener function */
+XCTRL_API void event_loop(Display*disp, EventCallback cb, void*cb_data);
+
+

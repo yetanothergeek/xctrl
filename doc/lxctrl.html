@@ -125,7 +125,9 @@ another new object. This will help insure that the first instance is properly cl
 <td>-- Send simulated keyboard actions to a window.</td></tr>
 <tr class="odd"><td class="func"><a href="#do_events"> do_events( [count] )</a></td>
 <td>-- Flush the X server's event queue.</td></tr>
-<tr class="even"><td class="func"><a href="#convert_locale">convert_locale (str,from,to)</a></td>
+<tr class="even"><td class="func"><a href="#listen">listen (event_handler)</a></td>
+<td>-- Monitor the window manager for events.</td></tr>
+<tr class="odd"><td class="func"><a href="#convert_locale">convert_locale (str,from,to)</a></td>
 <td>-- Convert string between locales.</td></tr>
 </table>
 <hr>
@@ -450,12 +452,87 @@ message to the display, which flushes the event queue and waits until all reques
 received and processed by the X server. This process is performed <tt><b><i>count</i></b></tt> 
 number of times (default: once).
 <br><br></p>
+
+
+<a name="listen"></a><hr><h3><tt>listen ( handler )</tt></h3>
+<p>
+Continuously "listens" for window manager events, and runs the function <i><b>handler</b></i> 
+each time an event occurs.</p><p>
+The event handler function should be in the form of:
+<pre><b>  function event_handler(ev,id)
+    </b><i>-- handle the event here</i><b>
+    return true
+  end
+</b></pre>
+<p>
+Note that the handler <i>must</i> return <tt><b>true</b></tt> to continue listening, 
+or <tt><b>false</b></tt> to stop listening.
+</p><p>
+The value of the string <i><b>ev</b></i> will be one of:<br>
+  &nbsp; <tt>"w"</tt> -- A new window was created.<br>
+  &nbsp; <tt>"x"</tt> -- The window was closed (its <i><b>id</b></i> is no longer valid<b>!</b>).<br>
+  &nbsp; <tt>"a"</tt> -- The window was activated (gained focus).<br>
+  &nbsp; <tt>"i"</tt> -- The window became inactive (lost focus).<br>
+  &nbsp; <tt>"g"</tt> -- The window's exterior geometry changed (size, position, or decoration).<br>
+  &nbsp; <tt>"d"</tt> -- Switched desktops: in this case <i><b>id</b></i> is the index of the activated desktop.<br>
+</p><p>
+Unless noted above, the value of the integer <i><b>id</b></i> is the ID of the window
+that triggered the event.</p><p>
+Note: Rather than using expensive string comparisons on the value of <i><b>ev</b></i>, it may be
+more efficient to set up a table of functions as illustrated below:
+<pre>
+  local xc=xctrl.new()
+
+  local event_callbacks = {
+    w = function(id) 
+          io.write("A new window ",id, " was created.\n")
+          return true 
+        end,
+    x = function(id)
+          io.write("The window ", id, " was closed.\n")
+          return true
+        end,
+    a = function(id)
+          io.write("The window ", id, " was activated.\n")
+          return true
+        end,
+    i = function(id)
+          io.write("The window ", id, " became inactive.\n")
+          return true
+        end,
+    g = function(id) 
+          io.write("The window ", id, " geometry changed.\n") 
+          return true
+        end,
+    d = function(id) 
+          io.write("Switched to desktop number ", id, ".\n")
+          return true
+        end
+  }
+
+  function my_event_handler(ev,id)
+    local callback=event_callbacks[ev]
+    if callback ~= nil then
+      return callback(id)
+    else
+      return true
+    end
+  end
+
+  xc:listen(my_event_handler)
+</pre>
+
+<br><br></p>
+
+
+
+
+
 <a name="convert_locale"></a><hr><h3><tt>convert_locale (str,from,to)</tt></h3>
 <p>
 Converts the string <tt><b><i>str</i></b></tt> from its original encoding <tt><b><i>from</i></b></tt> 
 into the new encoding <tt><b><i>to</i></b></tt> and returns the new string.
 <br><br></p>
-
 <hr>
 <br><br><br><br><br><br><br>
 </body>

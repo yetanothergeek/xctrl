@@ -916,6 +916,47 @@ static int lwmc_set_selection(lua_State*L)
 
 
 
+typedef struct {
+  int i;
+  lua_State *L;
+} cbdata;
+
+
+
+static int lwmc_listen_cb(int ev, Window id, void*p)
+{
+  const char* evmap[] = {
+    "w", /* XCTRL_EVENT_WINDOW_LIST_INSERT */
+    "x", /* XCTRL_EVENT_WINDOW_LIST_DELETE */
+    "a", /* XCTRL_EVENT_WINDOW_FOCUS_GAINED */
+    "i", /* XCTRL_EVENT_WINDOW_FOCUS_LOST */
+    "g", /* XCTRL_EVENT_WINDOW_MOVE_RESIZE */
+    "d", /* XCTRL_EVENT_DESKTOP_SWITCH */
+  };
+  cbdata*c=(cbdata*)p;
+  lua_rawgeti(c->L, LUA_REGISTRYINDEX, c->i);
+  lua_pushstring(c->L, evmap[ev]);
+  lua_pushnumber(c->L, (ev==XCTRL_EVENT_DESKTOP_SWITCH)?id+1:id);
+  lua_pcall(c->L, 2, 1, 0);
+  return lua_toboolean(c->L,-1); 
+}
+
+
+
+static int lwmc_listen(lua_State*L)
+{ 
+  cbdata c;
+  XCtrl*ud=lwmc_check_obj(L);
+  luaL_argcheck(L,lua_isfunction(L,2),2,"expected function");
+  c.L=L;
+  c.i=luaL_ref(L,LUA_REGISTRYINDEX);
+  event_loop(ud->dpy,lwmc_listen_cb,&c);
+  luaL_unref(L,LUA_REGISTRYINDEX,c.i);
+  return 0;
+}
+
+
+
 static const struct luaL_Reg lwmc_funcs[] = {
   {"new",             lwmc_new},
   {"get_win_list",    lwmc_get_win_list},
@@ -959,6 +1000,7 @@ static const struct luaL_Reg lwmc_funcs[] = {
   {"convert_locale",  lwmc_convert_locale},
   {"get_selection",   lwmc_get_selection},
   {"set_selection",   lwmc_set_selection},
+  {"listen",          lwmc_listen},
   {NULL,NULL}
 };
 
