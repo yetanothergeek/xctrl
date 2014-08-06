@@ -1542,8 +1542,8 @@ XCTRL_API void event_loop(Display*disp, EventCallback cb, void*cb_data)
   }
   XSelectInput(disp, DefRootWin, PropertyChangeMask);
   while (1) {
-    XNextEvent(disp, &ev);
     int rv=1;
+    XNextEvent(disp, &ev);
     switch (ev.type) {
       case PropertyNotify: {
         int ev_tag=-1;
@@ -1555,9 +1555,9 @@ XCTRL_API void event_loop(Display*disp, EventCallback cb, void*cb_data)
         }
         switch (ev_tag) {
           case EV_NET_CLIENT_LIST: {
-            clients=get_net_client_list(disp, &n);
             WinListItem*p1=ev_winlist;
             WinListItem*p2=NULL;
+            clients=get_net_client_list(disp, &n);
             while (p1) { /* Remove any deleted windows */
               int do_del=1;
               p2=p1->next;
