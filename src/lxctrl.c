@@ -931,6 +931,8 @@ static int lwmc_listen_cb(int ev, Window id, void*p)
     "a", /* XCTRL_EVENT_WINDOW_FOCUS_GAINED */
     "i", /* XCTRL_EVENT_WINDOW_FOCUS_LOST */
     "g", /* XCTRL_EVENT_WINDOW_MOVE_RESIZE */
+    "t", /* XCTRL_EVENT_WINDOW_TITLE */
+    "s", /* XCTRL_EVENT_WINDOW_STATE */
     "d", /* XCTRL_EVENT_DESKTOP_SWITCH */
   };
   cbdata*c=(cbdata*)p;

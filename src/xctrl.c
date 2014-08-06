@@ -1365,11 +1365,16 @@ XCTRL_API uchar* get_selection(Display*dpy, char kind, Bool utf8)
 /* * * * * * * * * * * * *  Event Listener * * * * * * * * * * * * * */
 /*********************************************************************/
 
+/*
+  Portions of the event listener were adapted from "F***ing Small Panel" 
+  Copyright (c) 2000-2002 by Peter Zelezny, which was released under a 
+  MIT/X style license.
+*/
 
 static Window*get_net_client_list(Display*disp, ulong*nitems) {
   Atom type=XA_WINDOW;
-  Atom a=0;
-  Display*old_disp=NULL;
+  static Atom a=0;
+  static Display*old_disp=NULL;
   Atom ret_type;
   int format;
   ulong after=0;
@@ -1388,6 +1393,50 @@ static Window*get_net_client_list(Display*disp, ulong*nitems) {
     return NULL;
   }
   return (Window*)retp;
+}
+
+
+
+static int window_has_prop(Display*disp, Window w, Atom a, Atom type) {
+  Atom ret_type;
+  int format;
+  ulong nitems;
+  ulong after;
+  unsigned char *retp;
+  int ret=0;
+  if (XGetWindowProperty(disp,w,a,0,1024,False,type,&ret_type,&format,&nitems,&after,&retp) == Success) {
+    if (retp) {
+      XFree(retp);
+      if (ret_type == type) { ret=1; }
+    }
+  }
+  return ret;
+}
+
+
+
+static int has_net_wm_name(Display*disp, Window w) {
+  static Display*old_disp=NULL;
+  static Atom type=0;
+  static Atom a=0;
+  if (disp!=old_disp) {
+    old_disp=disp;
+    a=XInternAtom(disp, "_NET_WM_NAME", False);
+    type=XInternAtom(disp, "UTF8_STRING", False);
+  }
+  return window_has_prop(disp, w, a, type);
+}
+
+
+
+static int has_net_wm_state(Display*disp, Window w) {
+  static Display*old_disp=NULL;
+  static Atom a=0;
+  if (disp!=old_disp) {
+    old_disp=disp;
+    a=XInternAtom(disp, "_NET_WM_STATE", False);
+  }
+  return window_has_prop(disp, w, a, XA_ATOM);
 }
 
 
@@ -1447,6 +1496,8 @@ static void winlist_free_all(WinListItem*list)
 }
 
 
+/* Set this to 1 to print unhandled events to stderr */
+#define PRINT_UNHANDLED_EVENTS 0
 
 #define EVENT_ATOM_COUNT (sizeof(event_names)/sizeof(char*))
 
@@ -1458,11 +1509,23 @@ XCTRL_API void event_loop(Display*disp, EventCallback cb, void*cb_data)
     EV_NET_ACTIVE_WINDOW,
     EV_NET_CLIENT_LIST,
     EV_NET_CURRENT_DESKTOP,
+    EV_NET_WM_NAME,
+    EV_NET_WM_ICON_NAME,
+    EV_NET_WM_STATE,
+    EV_WM_NAME,
+    EV_WM_ICON_NAME,
+    EV_WM_STATE
   };
   static char*event_names[]={
     "_NET_ACTIVE_WINDOW",
     "_NET_CLIENT_LIST",
     "_NET_CURRENT_DESKTOP",
+    "_NET_WM_NAME",
+    "_NET_WM_ICON_NAME",
+    "_NET_WM_STATE",
+    "WM_NAME",
+    "WM_ICON_NAME",
+    "WM_STATE"
   };
   static Display*old_disp=NULL;
   static Atom event_atoms[EVENT_ATOM_COUNT]={0,};
@@ -1529,6 +1592,36 @@ XCTRL_API void event_loop(Display*disp, EventCallback cb, void*cb_data)
           }
           case EV_NET_CURRENT_DESKTOP: {
             rv=cb(XCTRL_EVENT_DESKTOP_SWITCH,get_current_desktop(disp),cb_data);
+            break;
+          }
+          case EV_NET_WM_NAME: {
+            rv=cb(XCTRL_EVENT_WINDOW_TITLE,ev.xproperty.window,cb_data);
+            break;
+          }
+          case EV_NET_WM_STATE: {
+            rv=cb(XCTRL_EVENT_WINDOW_STATE,ev.xproperty.window,cb_data);
+            break;
+          }
+          case EV_WM_NAME: { /* ignore WM_NAME if we can use _NET_WM_NAME instead */
+            if (!has_net_wm_name(disp,ev.xproperty.window)) {
+              rv=cb(XCTRL_EVENT_WINDOW_TITLE,ev.xproperty.window,cb_data);
+            }
+            break;
+          }
+          case EV_WM_STATE: { /* ignore WM_STATE if we can use _NET_WM_STATE instead */
+            if (!has_net_wm_state(disp,ev.xproperty.window)) {
+              rv=cb(XCTRL_EVENT_WINDOW_STATE,ev.xproperty.window,cb_data);
+            }
+            break;
+          }
+          case EV_NET_WM_ICON_NAME:  { break; }  /* unused */
+          case EV_WM_ICON_NAME:      { break; }  /* unused */
+          default: {
+#          if PRINT_UNHANDLED_EVENTS
+            char*nm=XGetAtomName(disp, ev.xproperty.atom);
+            fprintf(stderr, "PropertyNotify: unhandled atom \"%s\" for window %ld\n", nm, ev.xproperty.window);
+            XFree(nm);
+#          endif
           }
         }
         break;
@@ -1544,6 +1637,14 @@ XCTRL_API void event_loop(Display*disp, EventCallback cb, void*cb_data)
       case FocusOut: {
         rv=cb(XCTRL_EVENT_WINDOW_FOCUS_LOST,ev.xfocus.window,cb_data);
         break;
+      }
+      case DestroyNotify: { break; } /* unused */
+      case UnmapNotify:   { break; } /* unused */
+      case MapNotify:     { break; } /* unused */
+      default: {
+#      if PRINT_UNHANDLED_EVENTS
+        fprintf(stderr, "Unhandled event of type %d\n", ev.type);
+#      endif
       }
     }
     if (!rv) { break; }

@@ -474,6 +474,8 @@ The value of the string <i><b>ev</b></i> will be one of:<br>
   &nbsp; <tt>"a"</tt> -- The window was activated (gained focus).<br>
   &nbsp; <tt>"i"</tt> -- The window became inactive (lost focus).<br>
   &nbsp; <tt>"g"</tt> -- The window's exterior geometry changed (size, position, or decoration).<br>
+  &nbsp; <tt>"t"</tt> -- The window's title text changed.<br>
+  &nbsp; <tt>"s"</tt> -- The window's state changed (iconified, maximized, sticky, layer, etc.)<br>
   &nbsp; <tt>"d"</tt> -- Switched desktops: in this case <i><b>id</b></i> is the index of the activated desktop.<br>
 </p><p>
 Unless noted above, the value of the integer <i><b>id</b></i> is the ID of the window
@@ -504,6 +506,14 @@ more efficient to set up a table of functions as illustrated below:
           io.write("The window ", id, " geometry changed.\n") 
           return true
         end,
+    t = function(id) 
+        io.write("The window ", id, " title changed.\n") 
+        return true
+      end,
+    s = function(id) 
+        io.write("The window ", id, " state changed.\n") 
+        return true
+      end,
     d = function(id) 
           io.write("Switched to desktop number ", id, ".\n")
           return true
