@@ -36,7 +36,7 @@ other applications by typing "make lib" but there is currently no
 
 
 To link the C library statically into your own standalone application 
-or library, define XCTRL_API as static and include the "wmctrl.c" 
+or library, define XCTRL_API as static and include the "xctrl.c" 
 source file directly:
 
  #include <X11/Xlib.h>
@@ -46,7 +46,7 @@ source file directly:
 
 
 The Lua binding should be fairly well documented, see the file:
- ./docs/lwmctrl.html
+ ./docs/lxctrl.html
 
 There is currently no documentation for the C library, but reading the
 sources and the Lua docs should give you some idea of what's there.
