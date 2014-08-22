@@ -223,36 +223,44 @@ static char *get_output_str(char*str, Bool is_utf8) {
 
 #define get_uprop(wn,pn,sz) (ulong*)get_prop(disp, wn, XA_CARDINAL, pn, sz)
 
-static char *get_prop(Display*d, Window w, Atom type, const char*name, ulong*size) {
+static char *get_prop(Display*d, Window w, Atom type, const char*name, ulong*count) {
   Atom a=XInternAtom(d, name, False);
   Atom ret_type;
-  int format;
-  ulong nitems;
-  ulong after;
-  ulong tmp_size;
-  unsigned char *retp;
-  char *ret;
-# define MAX_PROP_VAL_LEN 4096
-# define MPVL4 MAX_PROP_VAL_LEN / 4
-  /*
-    MAX_PROP_VAL_LEN / 4 explanation (XGetWindowProperty manpage):
-   long_length = Specifies the length in 32-bit multiples of the data to be retrieved.
-  */
-  if (XGetWindowProperty(d,w,a,0,MPVL4,False,type,&ret_type,&format,&nitems,&after,&retp) != Success) { return NULL; }
-  if (ret_type != type) {
-    XFree(retp);
+  int format=0;
+  ulong nitems=0;
+  ulong after=0;
+  uchar *retp=NULL;
+  ulong total_bytes=0;
+  char*all=NULL;
+  XGetWindowProperty(d,w,a,0,0,False,AnyPropertyType,&ret_type,&format,&nitems,&after,&retp);
+  if (retp) { XFree(retp); }
+  if (type!=ret_type) {
+    if (count) { *count=0; }
     return NULL;
   }
-  /* null terminate the result to make string handling easier */
-  tmp_size = (format / 8) * nitems;
-  ret = (char*)calloc(tmp_size + 1, 1);
-  memcpy(ret, retp, tmp_size);
-  ret[tmp_size] = '\0';
-  if (size) {
-    *size = tmp_size;
+  all=(char*)malloc(1);
+  do {
+    XGetWindowProperty(d,w,a,total_bytes/4,1024,False,ret_type,&ret_type,&format,&nitems,&after,&retp);
+    if (retp) {
+      uint chunk_bytes = (format/8)*nitems;
+      if (format == 32) { chunk_bytes *= sizeof(long) / 4; } /* Fix x86_64 handling 32-bit data */
+      all = (char*)realloc(all,chunk_bytes+total_bytes+1);
+      memcpy(&(all[total_bytes]), retp, chunk_bytes);
+      total_bytes+=chunk_bytes;
+      XFree(retp);
+    }
+  } while (after!=0);
+  if (total_bytes) {
+    all[total_bytes] = '\0';
+    if (count) {
+      *count=total_bytes/(format/8);
+      if (format == 32) { *count /= sizeof(long) / 4; } /* Fix x86_64 handling 32-bit data */
+    }
+    return(all);
+  } else {
+    free(all);
+    return NULL;
   }
-  XFree(retp);
-  return ret;
 }
 
 
@@ -508,7 +516,7 @@ XCTRL_API Bool wm_supports(Display*disp, const char*prop) {
   int i;
   Atom *list=(Atom*)get_prop(disp, DefRootWin, XA_ATOM, "_NET_SUPPORTED", &size);
   if (!list) { return False; }
-  for (i = 0; i < size / sizeof(Atom); i++) {
+  for (i = 0; i < size; i++) {
     if (list[i] == xa_prop) {
       free(list);
       return True;
@@ -672,7 +680,6 @@ XCTRL_API Window *get_window_list(Display*disp, ulong*size)
   if (!client_list) {
     client_list = (Window*)get_prop(disp, DefRootWin, XA_CARDINAL, "_WIN_CLIENT_LIST", size);
   }
-  *size=*size / sizeof(Window);
   return client_list;
 }
 
@@ -836,7 +843,7 @@ XCTRL_API int get_workarea_geom(Display*disp, Geometry*geom, int desknum)
       geom->h=wkarea[3];
       rv=1;
     } else {
-      if (desknum < wkarea_size / sizeof(*wkarea) / 4) {
+      if (desknum < (wkarea_size/4)) {
         geom->y=wkarea[desknum*4];
         geom->x=wkarea[desknum*4+1];
         geom->w=wkarea[desknum*4+2];
