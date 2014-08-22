@@ -504,7 +504,7 @@ XCTRL_API int set_window_state(Display*disp, Window win, ulong action, const cha
 
 XCTRL_API Bool wm_supports(Display*disp, const char*prop) {
   Atom xa_prop = XInternAtom(disp, prop, False);
-  ulong size;
+  ulong size=0;
   int i;
   Atom *list=(Atom*)get_prop(disp, DefRootWin, XA_ATOM, "_NET_SUPPORTED", &size);
   if (!list) { return False; }
@@ -682,7 +682,7 @@ XCTRL_API char *get_window_class(Display*disp, Window win)
 {
   char *class_utf8;
   char *wm_class;
-  ulong size;
+  ulong size=0;
   wm_class = get_prop(disp, win, XA_STRING, "WM_CLASS", &size);
   if (wm_class) {
     char *p_0 = strchr(wm_class, '\0');

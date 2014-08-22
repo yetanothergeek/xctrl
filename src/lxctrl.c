@@ -723,7 +723,7 @@ static int lwmc_get_desk_geom(lua_State*L) {
 static int lwmc_get_win_list(lua_State*L)
 {
   XCtrl*ud=lwmc_check_obj(L);
-  unsigned long size;
+  ulong size=0;
   Window*list=get_window_list(ud->dpy, &size);
   if (list) {
     unsigned long i;
