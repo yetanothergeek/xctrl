@@ -3,6 +3,28 @@
 #  detailed list of changes, see the git log.
 ##########################################################
 
+2014-08-22:
+  Reworked get_prop() to fix some problems on 64-bit platforms
+
+2014-08-06:
+  Added "title" and "state" events to listen()
+
+2014-08-05:
+  Added a function to "listen" for some window manager events
+
+2014-08-01:
+  Added a function to manipulate window decorations via _MOTIF_WM_HINTS
+
+2014-08-01:
+  Added a function to get the _NET_WM_WINDOW_TYPE of a window
+
+2014-07-31:
+  Added a function to retrieve a window's frame dimensions (borders)
+
+2014-07-31:
+  Changes to set_win_geom() function:  accept a table or 4 numbers, 
+  use nil instead of negative, added optional "gravity" parameter.
+
 2013-06-19:
   Lua 5.2 compatibility
 
