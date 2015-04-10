@@ -3,6 +3,9 @@
 #  detailed list of changes, see the git log.
 ##########################################################
 
+2015-03-18:
+  Moved source code repository from googlecode to github
+
 2014-08-22:
   Reworked get_prop() to fix some problems on 64-bit platforms
 
