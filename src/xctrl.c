@@ -844,8 +844,8 @@ XCTRL_API int get_workarea_geom(Display*disp, Geometry*geom, int desknum)
       rv=1;
     } else {
       if (desknum < (wkarea_size/4)) {
-        geom->y=wkarea[desknum*4];
-        geom->x=wkarea[desknum*4+1];
+        geom->x=wkarea[desknum*4];
+        geom->y=wkarea[desknum*4+1];
         geom->w=wkarea[desknum*4+2];
         geom->h=wkarea[desknum*4+3];
         rv=1;
